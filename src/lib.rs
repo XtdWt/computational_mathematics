@@ -16,7 +16,7 @@ fn wrap_py_function(py_function: Py<PyAny>) -> Function {
     // wrap python function to rust function on heap
     Box::new(move |x| {
         let y: f64 = Python::attach(
-            |py| py_function.call1(py, (x,)).unwrap().as_ref().extract(py).unwrap());
+            |py| py_function.call1(py, (x,)).unwrap().extract(py).unwrap());
         y
     })
 }
