@@ -1,2 +1,3 @@
 pub mod herons_method;
 pub mod bisection_method;
+pub mod newton_raphson_method;
