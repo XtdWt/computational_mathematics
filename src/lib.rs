@@ -28,31 +28,31 @@ pub fn herons_method_py(a: f64, x_0: f64, n_max: i64) -> f64 {
 
 
 #[pyfunction(name="bisection_method")]
-#[pyo3(signature = (function, a, b, n_max=100))]
-pub fn bisection_method_py(function: Py<PyAny>, a: f64, b: f64, n_max: i64) -> Option<f64> {
+#[pyo3(signature = (function, a, b, n_max=100, eps_tol=0.000001))]
+pub fn bisection_method_py(function: Py<PyAny>, a: f64, b: f64, n_max: i64, eps_tol: f64) -> Option<f64> {
     let f: Function = wrap_py_function(function);
     if f(a) * f(b) < 0.0 {
         return None
     }
-    Some(bisection_method(f, a, b, n_max))
+    Some(bisection_method(f, a, b, n_max, eps_tol))
 }
 
 
 #[pyfunction(name="newton_raphson_method")]
-#[pyo3(signature = (function, derivative, x_0, n_max=100))]
-pub fn newton_raphson_method_py(function: Py<PyAny>, derivative: Py<PyAny>, x_0: f64, n_max: i64) -> f64 {
+#[pyo3(signature = (function, derivative, x_0, n_max=100, eps_tol=0.000001))]
+pub fn newton_raphson_method_py(function: Py<PyAny>, derivative: Py<PyAny>, x_0: f64, n_max: i64, eps_tol: f64) -> f64 {
     // wrap python function to rust function on heap
     let f: Function = wrap_py_function(function);
     let df: Function = wrap_py_function(derivative);
-    newton_raphson_method(f, df, x_0, n_max)
+    newton_raphson_method(f, df, x_0, n_max, eps_tol)
 }
 
 
 #[pyfunction(name="secant_method")]
-#[pyo3(signature = (function, x_0, x_1, n_max=100))]
-pub fn secant_method_py(function: Py<PyAny>, x_0: f64, x_1: f64, n_max: i64) -> f64 {
+#[pyo3(signature = (function, x_0, x_1, n_max=100, eps_tol=0.000001))]
+pub fn secant_method_py(function: Py<PyAny>, x_0: f64, x_1: f64, n_max: i64, eps_tol: f64) -> f64 {
     let f: Function = wrap_py_function(function);
-    secant_method(f, x_0, x_1, n_max)
+    secant_method(f, x_0, x_1, n_max, eps_tol)
 }
 
 

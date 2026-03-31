@@ -6,6 +6,7 @@ pub fn newton_raphson_method(
     derivative: Function,
     x_0: f64,
     n_max: i64,
+    eps_tol: f64,
 ) -> f64 {
     let mut x = x_0;
 
@@ -13,7 +14,11 @@ pub fn newton_raphson_method(
         let y = function(x);
         let dydx = derivative(x);
         let dx = - y/dydx;
-        x = x + dx;
+        let x_next = x + dx;
+        if (x_next - x).abs() < eps_tol {
+            return x_next
+        }
+        x = x_next;
     }
     x
 }
@@ -28,7 +33,7 @@ mod tests {
         let f = Box::new(|x: f64| x*x + 3.0*x - 3.0);
         let df = Box::new(|x: f64| 2.0*x + 3.0);
         assert_eq!(
-            newton_raphson_method(f, df, 1.0, 1), 1.0 - (1.0/5.0)
+            newton_raphson_method(f, df, 1.0, 1, 1e-6), 1.0 - (1.0/5.0)
         )
     }
 
@@ -38,7 +43,7 @@ mod tests {
         let f = Box::new(|x: f64| x*x + 3.0*x - 3.0);
         let df = Box::new(|x: f64| 2.0*x + 3.0);
         assert!(
-            newton_raphson_method(f, df, 1.0, 2) - 0.8 - (0.04 / 4.6) < epsilon
+            newton_raphson_method(f, df, 1.0, 2, 1e-6) - 0.8 - (0.04 / 4.6) < epsilon
         )
     }
 
@@ -48,7 +53,7 @@ mod tests {
         let f = Box::new(|x: f64| x*x + 3.0*x - 3.0);
         let df = Box::new(|x: f64| 2.0*x + 3.0);
         assert!(
-            newton_raphson_method(f, df, 1.0, 20) - 0.79128784 < epsilon
+            newton_raphson_method(f, df, 1.0, 20, 1e-6) - 0.79128784 < epsilon
         )
     }
 
@@ -58,7 +63,7 @@ mod tests {
         let f = Box::new(|x: f64| x + 3.0);
         let df = Box::new(|_x: f64| 1.0);
         assert!(
-            newton_raphson_method(f, df, 1.0, 20) + 3.0 < epsilon
+            newton_raphson_method(f, df, 1.0, 20, 1e-6) + 3.0 < epsilon
         )
     }
 }
