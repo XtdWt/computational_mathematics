@@ -1,9 +1,9 @@
-use crate::F;
+use crate::Function;
 
 
 pub fn newton_raphson_method(
-    function: F,
-    derivative: F,
+    function: Function,
+    derivative: Function,
     x_0: f64,
     n_max: i64,
 ) -> f64 {

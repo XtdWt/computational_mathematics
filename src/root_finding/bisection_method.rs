@@ -1,7 +1,7 @@
-use crate::F;
+use crate::Function;
 
 pub fn bisection_method(
-    function: F,
+    function: Function,
     a: f64,
     b: f64,
     n_max: i64
