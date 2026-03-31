@@ -1,9 +1,7 @@
 pub fn herons_method(a: f64, x_0: f64, n_max: i64) -> f64 {
-    let mut n: i64 = 0;
     let mut x: f64 = x_0;
-    while n < n_max {
+    for _ in 0..n_max {
         x = 0.5 * (x + a/x);
-        n = n + 1;
     }
     x
 }
