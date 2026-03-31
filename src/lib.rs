@@ -15,8 +15,9 @@ type Function = Box<dyn Fn(f64) -> f64>;
 fn wrap_py_function(py_function: Py<PyAny>) -> Function {
     // wrap python function to rust function on heap
     Box::new(move |x| {
-        Python::attach(|py| py_function.call1(py, (x,)).unwrap());
-        x
+        let y: f64 = Python::attach(
+            |py| py_function.call1(py, (x,)).unwrap().as_ref().extract(py).unwrap());
+        y
     })
 }
 
@@ -38,7 +39,7 @@ pub fn bisection_method_py(
     eps_tol: f64,
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(f);
-    if f(a) * f(b) < 0.0 {
+    if f(a) * f(b) > 0.0 {
         return Err(PyValueError::new_err(
             "`f(a)` and `f(b)` have the same sign.",
         ));
@@ -79,6 +80,7 @@ pub fn secant_method_py(
 #[pymodule]
 fn comp_math(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(herons_method_py, m)?)?;
+    m.add_function(wrap_pyfunction!(secant_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(bisection_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(newton_raphson_method_py, m)?)?;
     Ok(())
