@@ -1,13 +1,14 @@
-mod root_finding;
-
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
 
+mod root_finding;
 use crate::root_finding::herons_method::herons_method;
 use crate::root_finding::secant_method::secant_method;
 use crate::root_finding::bisection_method::bisection_method;
 use crate::root_finding::newton_raphson_method::newton_raphson_method;
 
+mod interpolation;
+use crate::interpolation::lagrange_interpolation::lagrange_interpolation;
 
 type Function = Box<dyn Fn(f64) -> f64>;
 
