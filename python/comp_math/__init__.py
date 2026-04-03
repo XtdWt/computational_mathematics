@@ -6,6 +6,7 @@ from .comp_math import (
     barycentric_lagrange_interpolation,
     newtons_divided_difference_interpolation,
     chebyshev_nodes,
+    cubic_spline_interpolation,
 )
 
 
@@ -17,4 +18,5 @@ __all__ = [
     "barycentric_lagrange_interpolation",
     "newtons_divided_difference_interpolation",
     "chebyshev_nodes",
+    "cubic_spline_interpolation",
 ]

@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use crate::interpolation::polynomial::{Evaluatable};
+use crate::interpolation::util::{Evaluatable};
 
 
 #[pyclass]
@@ -11,7 +11,7 @@ pub struct NewtonsDividedDifferencePolynomial {
 
 
 impl Evaluatable for NewtonsDividedDifferencePolynomial {
-    fn eval(&self, x: f64) -> f64 {
+    fn eval(&self, x: f64) -> Option<f64> {
         let mut total = 0.0;
         for i in 0..self.n {
             let mut c = self.divided_differences[i];
@@ -20,15 +20,7 @@ impl Evaluatable for NewtonsDividedDifferencePolynomial {
             }
             total += c;
         }
-        total
-    }
-}
-
-
-#[pymethods]
-impl NewtonsDividedDifferencePolynomial {
-    fn __call__(&self, x:f64) -> f64 {
-        self.eval(x)
+        Some(total)
     }
 }
 
@@ -71,7 +63,7 @@ mod tests {
         let ys = vec![2.0];
         let poly1 = newtons_divided_difference_interpolation(xs, ys);
         for i in 0..5 {
-            assert_eq!(poly1.eval(i as f64), 2.0);
+            assert_eq!(poly1.eval(i as f64).unwrap(), 2.0);
         }
     }
 
@@ -82,7 +74,7 @@ mod tests {
         let poly2 = newtons_divided_difference_interpolation(xs, ys);
         let poly2_y_values = vec!(1.0, 1.0, 2.0, 4.0, 7.0);
         for i in 0..5 {
-            assert_eq!((poly2.eval(i as f64) - poly2_y_values[i]).abs() < 1e-6, true);
+            assert_eq!((poly2.eval(i as f64).unwrap() - poly2_y_values[i]).abs() < 1e-6, true);
         }
     }
 }

@@ -1,3 +1,5 @@
+// use std::f64::NAN;
+
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
 
@@ -8,6 +10,7 @@ use crate::root_finding::bisection_method::bisection_method;
 use crate::root_finding::newton_raphson_method::newton_raphson_method;
 
 mod interpolation;
+use crate::interpolation::util::Evaluatable;
 use crate::interpolation::barycentric_lagrange_interpolation::{
     barycentric_lagrange_interpolation,
     LagrangePolynomial,
@@ -17,6 +20,10 @@ use crate::interpolation::newtons_divided_difference_interpolation::{
     NewtonsDividedDifferencePolynomial,
 };
 use crate::interpolation::chebyshev_nodes::chebyshev_nodes;
+use crate::interpolation::cubic_spline_interpolation::{
+    cubic_spline_interpolation,
+    CubicSplineInterpolation,
+};
 
 
 type Function = Box<dyn Fn(f64) -> f64>;
@@ -87,12 +94,28 @@ pub fn secant_method_py(
 }
 
 
+#[pymethods]
+impl LagrangePolynomial {
+    fn __call__(&self, x:f64) -> f64 {
+        self.eval(x).unwrap_or_else(|| f64::NAN)
+    }
+}
+
+
 #[pyfunction(name = "barycentric_lagrange_interpolation")]
 pub fn barycentric_lagrange_interpolation_py(
     xs: Vec<f64>,
     ys: Vec<f64>,
 ) -> LagrangePolynomial {
     barycentric_lagrange_interpolation(xs, ys)
+}
+
+
+#[pymethods]
+impl NewtonsDividedDifferencePolynomial {
+    fn __call__(&self, x:f64) -> f64 {
+        self.eval(x).unwrap_or_else(|| f64::NAN)
+    }
 }
 
 
@@ -115,6 +138,21 @@ pub fn chebyshev_nodes_py(
 }
 
 
+
+#[pymethods]
+impl CubicSplineInterpolation {
+    fn __call__(&self, x: f64) -> f64 {
+        self.eval(x).unwrap_or_else(|| f64::NAN)
+    }
+}
+
+
+#[pyfunction(name = "cubic_spline_interpolation")]
+pub fn cubic_spline_interpolation_py(xs: Vec<f64>, ys: Vec<f64>) -> CubicSplineInterpolation {
+    cubic_spline_interpolation(xs, ys)
+}
+
+
 #[pymodule]
 fn comp_math(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(herons_method_py, m)?)?;
@@ -124,5 +162,6 @@ fn comp_math(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(barycentric_lagrange_interpolation_py, m)?)?;
     m.add_function(wrap_pyfunction!(newtons_divided_difference_interpolation_py, m)?)?;
     m.add_function(wrap_pyfunction!(chebyshev_nodes_py, m)?)?;
+    m.add_function(wrap_pyfunction!(cubic_spline_interpolation_py, m)?)?;
     Ok(())
 }

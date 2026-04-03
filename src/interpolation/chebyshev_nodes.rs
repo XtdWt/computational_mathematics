@@ -1,15 +1,5 @@
-use std::cmp::Ordering;
 use std::f64::consts::PI;
-
-
-fn cmp_f64(a: &f64, b: &f64) -> Ordering {
-    if a < b {
-        return Ordering::Less
-    } else if a > b {
-        return Ordering::Greater
-    }
-    Ordering::Equal
-}
+use crate::interpolation::util::cmp_f64;
 
 
 pub fn chebyshev_nodes(
