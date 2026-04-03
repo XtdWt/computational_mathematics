@@ -3,6 +3,7 @@ from .comp_math import (
     bisection_method,
     newton_raphson_method,
     secant_method,
+    barycentric_lagrange_interpolation,
 )
 
 
@@ -11,4 +12,5 @@ __all__ = [
     "bisection_method",
     "newton_raphson_method",
     "secant_method",
+    "barycentric_lagrange_interpolation",
 ]

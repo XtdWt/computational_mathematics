@@ -47,7 +47,7 @@ pub fn barycentric_lagrange_interpolation(
         let mut weight_i = 1.0;
         for k in 0..n {
             if k != i {
-                weight_i *= (xs[i] - xs[k])
+                weight_i *= xs[i] - xs[k]
             }
         }
         weights.push(1.0/weight_i);
