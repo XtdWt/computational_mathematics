@@ -52,7 +52,6 @@ pub fn barycentric_lagrange_interpolation(
         }
         weights.push(1.0/weight_i);
     }
-    println!("{:?}", weights);
     LagrangePolynomial{
         weights,
         xs,
@@ -83,7 +82,7 @@ mod tests {
         let poly2 = barycentric_lagrange_interpolation(xs, ys);
         let poly2_y_values = vec!(1.0, 1.0, 2.0, 4.0, 7.0);
         for i in 0..5 {
-            assert_eq!(poly2.eval(i as f64) - poly2_y_values[i] < 1e-6, true);
+            assert_eq!((poly2.eval(i as f64) - poly2_y_values[i]).abs() < 1e-6, true);
         }
     }
 }

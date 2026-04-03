@@ -5,7 +5,7 @@ pub fn secant_method(
     f: Function,
     x_0: f64,
     x_1: f64,
-    n_max: i64,
+    n_max: usize,
     eps_tol: f64,
 ) -> f64 {
     let mut x0 = x_0;

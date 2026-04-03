@@ -10,8 +10,13 @@ use crate::root_finding::newton_raphson_method::newton_raphson_method;
 mod interpolation;
 use crate::interpolation::barycentric_lagrange_interpolation::{
     barycentric_lagrange_interpolation,
-    LagrangePolynomial
+    LagrangePolynomial,
 };
+use crate::interpolation::newtons_divided_difference_interpolation::{
+    newtons_divided_difference_interpolation,
+    NewtonsDividedDifferencePolynomial,
+};
+use crate::interpolation::chebyshev_nodes::chebyshev_nodes;
 
 
 type Function = Box<dyn Fn(f64) -> f64>;
@@ -29,7 +34,7 @@ fn wrap_py_function(py_function: Py<PyAny>) -> Function {
 
 #[pyfunction(name = "herons_method")]
 #[pyo3(signature = (a, x_0 = 1.0, n_max=100))]
-pub fn herons_method_py(a: f64, x_0: f64, n_max: i64) -> f64 {
+pub fn herons_method_py(a: f64, x_0: f64, n_max: usize) -> f64 {
     herons_method(a, x_0, n_max)
 }
 
@@ -40,7 +45,7 @@ pub fn bisection_method_py(
     f: Py<PyAny>,
     a: f64,
     b: f64,
-    n_max: i64,
+    n_max: usize,
     eps_tol: f64,
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(f);
@@ -59,7 +64,7 @@ pub fn newton_raphson_method_py(
     function: Py<PyAny>,
     derivative: Py<PyAny>,
     x_0: f64,
-    n_max: i64,
+    n_max: usize,
     eps_tol: f64,
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(function);
@@ -74,7 +79,7 @@ pub fn secant_method_py(
     function: Py<PyAny>,
     x_0: f64,
     x_1: f64,
-    n_max: i64,
+    n_max: usize,
     eps_tol: f64
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(function);
@@ -91,6 +96,25 @@ pub fn barycentric_lagrange_interpolation_py(
 }
 
 
+#[pyfunction(name = "newtons_divided_difference_interpolation")]
+pub fn newtons_divided_difference_interpolation_py(
+    xs: Vec<f64>,
+    ys: Vec<f64>,
+) -> NewtonsDividedDifferencePolynomial {
+    newtons_divided_difference_interpolation(xs, ys)
+}
+
+
+#[pyfunction(name = "chebyshev_nodes")]
+pub fn chebyshev_nodes_py(
+    a: f64,
+    b: f64,
+    n: usize,
+) -> Vec<f64> {
+    chebyshev_nodes(a, b, n)
+}
+
+
 #[pymodule]
 fn comp_math(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(herons_method_py, m)?)?;
@@ -98,5 +122,7 @@ fn comp_math(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(bisection_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(newton_raphson_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(barycentric_lagrange_interpolation_py, m)?)?;
+    m.add_function(wrap_pyfunction!(newtons_divided_difference_interpolation_py, m)?)?;
+    m.add_function(wrap_pyfunction!(chebyshev_nodes_py, m)?)?;
     Ok(())
 }
