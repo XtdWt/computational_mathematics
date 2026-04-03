@@ -5,7 +5,7 @@ pub fn newton_raphson_method(
     function: Function,
     derivative: Function,
     x_0: f64,
-    n_max: i64,
+    n_max: usize,
     eps_tol: f64,
 ) -> f64 {
     let mut x = x_0;

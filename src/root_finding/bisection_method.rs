@@ -1,7 +1,7 @@
 use crate::Function;
 
 
-pub fn bisection_method(function: Function, a: f64, b: f64, n_max: i64, eps_tol: f64) -> f64 {
+pub fn bisection_method(function: Function, a: f64, b: f64, n_max: usize, eps_tol: f64) -> f64 {
     let mut lower = a;
     let mut upper = b;
     let mut c = (lower + upper) / 2.0;
