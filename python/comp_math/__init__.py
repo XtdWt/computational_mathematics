@@ -4,6 +4,8 @@ from .comp_math import (
     newton_raphson_method,
     secant_method,
     barycentric_lagrange_interpolation,
+    newtons_divided_difference_interpolation,
+    chebyshev_nodes,
 )
 
 
@@ -13,4 +15,6 @@ __all__ = [
     "newton_raphson_method",
     "secant_method",
     "barycentric_lagrange_interpolation",
+    "newtons_divided_difference_interpolation",
+    "chebyshev_nodes",
 ]
