@@ -8,7 +8,11 @@ use crate::root_finding::bisection_method::bisection_method;
 use crate::root_finding::newton_raphson_method::newton_raphson_method;
 
 mod interpolation;
-use crate::interpolation::lagrange_interpolation::lagrange_interpolation;
+use crate::interpolation::barycentric_lagrange_interpolation::{
+    barycentric_lagrange_interpolation, 
+    LagrangePolynomial
+};
+
 
 type Function = Box<dyn Fn(f64) -> f64>;
 
@@ -75,6 +79,15 @@ pub fn secant_method_py(
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(function);
     Ok(secant_method(f, x_0, x_1, n_max, eps_tol))
+}
+
+
+#[pyfunction(name = "barycentric_lagrange_interpolation")]
+pub fn barycentric_lagrange_interpolation_py(
+    xs: Vec<f64>,
+    ys: Vec<f64>,
+) -> LagrangePolynomial {
+    barycentric_lagrange_interpolation(xs, ys)
 }
 
 
