@@ -9,7 +9,7 @@ use crate::root_finding::newton_raphson_method::newton_raphson_method;
 
 mod interpolation;
 use crate::interpolation::barycentric_lagrange_interpolation::{
-    barycentric_lagrange_interpolation, 
+    barycentric_lagrange_interpolation,
     LagrangePolynomial
 };
 
@@ -97,5 +97,6 @@ fn comp_math(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(secant_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(bisection_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(newton_raphson_method_py, m)?)?;
+    m.add_function(wrap_pyfunction!(barycentric_lagrange_interpolation_py, m)?)?;
     Ok(())
 }
