@@ -1,16 +1,16 @@
 use pyo3::prelude::*;
 use nalgebra::DMatrix;
 use crate::interpolation::util::cmp_f64;
-use crate::interpolation::util::Evaluatable;
+use crate::interpolation::util::{Evaluatable, Differentiable, Integrable};
 
 
-struct CubicPolynomial {
-    weights: [f64; 4],
+struct Polynomial {
+    weights: Vec<f64>,
     x_i: f64,
 }
 
 
-impl Evaluatable for CubicPolynomial {
+impl Evaluatable for Polynomial {
     fn eval(&self, x: f64) -> Option<f64> {
         let mut total = 0.0;
         let x = x - self.x_i;
@@ -24,15 +24,52 @@ impl Evaluatable for CubicPolynomial {
 }
 
 
+impl Differentiable for Polynomial {
+    fn differentiate(&self) -> Self {
+        let mut diff_weights = Vec::new();
+        for i in 1..self.weights.len() {
+            diff_weights.push(self.weights[i] * i as f64);
+        }
+        
+        Polynomial{
+            weights: diff_weights,
+            x_i: self.x_i,
+        }
+    }
+}
+
+
+impl Integrable for Polynomial {
+    fn integrate(&self, x0: f64, y0: f64) -> Self {
+        let mut int_weights = Vec::new();
+        int_weights.push(0.0);
+        for i in 0..self.weights.len() {
+            int_weights.push(self.weights[i] / (i+1) as f64);
+        }
+        
+        let mut definite_integral = Polynomial{
+            weights: int_weights,
+            x_i: self.x_i,
+        };
+        let w_0 = y0 - definite_integral.eval(x0).unwrap();
+        definite_integral.weights[0] = w_0;
+        definite_integral
+    }
+}
+
+
 #[pyclass]
 pub struct CubicSplineInterpolation {
     x_ranges: Vec<(f64, f64)>,
-    y_functions: Vec<CubicPolynomial>,
+    y_functions: Vec<Polynomial>,
 }
 
 
 impl Evaluatable for CubicSplineInterpolation {
     fn eval(&self, x: f64) -> Option<f64> {
+        if x < self.x_ranges[0].0 {
+            return self.y_functions[0].eval(x)
+        }
         for i in 0..self.x_ranges.len() {
             let x_min = self.x_ranges[i].0;
             let x_max = self.x_ranges[i].1;
@@ -40,7 +77,7 @@ impl Evaluatable for CubicSplineInterpolation {
                 return self.y_functions[i].eval(x)
             }
         }
-        None
+        self.y_functions[self.y_functions.len()-1].eval(x)
     }
 }
 
@@ -90,10 +127,10 @@ pub fn cubic_spline_interpolation(
     }
     let mut y_functions = Vec::new();
     for i in 0..(xs.len()-1) {
-        let weights = [a_i[i], b_i[i], c_i[i], d_i[i]];
+        let weights = vec![a_i[i], b_i[i], c_i[i], d_i[i]];
         let x_i = xs[i];
         y_functions.push(
-            CubicPolynomial{
+            Polynomial{
                 weights,
                 x_i
             }
