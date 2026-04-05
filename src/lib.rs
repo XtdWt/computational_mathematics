@@ -8,20 +8,24 @@ use crate::root_finding::bisection_method::bisection_method;
 use crate::root_finding::newton_raphson_method::newton_raphson_method;
 
 mod interpolation;
-use crate::interpolation::util::{Differentiable, Evaluatable};
+use crate::interpolation::polynomial::{
+    Polynomial,
+    LagrangePolynomial,
+    NewtonsDividedDifferencePolynomial,
+    Differentiable,
+    Integrable,
+    Evaluatable,
+};
 use crate::interpolation::barycentric_lagrange_interpolation::{
     barycentric_lagrange_interpolation,
-    LagrangePolynomial,
 };
 use crate::interpolation::newtons_divided_difference_interpolation::{
-    newtons_divided_difference_interpolation,
-    NewtonsDividedDifferencePolynomial,
+    newtons_divided_difference_interpolation
 };
 use crate::interpolation::chebyshev_nodes::chebyshev_nodes;
 use crate::interpolation::cubic_spline_interpolation::{
     cubic_spline_interpolation,
     CubicSplineInterpolation,
-    Polynomial,
 };
 
 
@@ -141,6 +145,16 @@ impl Polynomial {
     fn __call__(&self, x: f64) -> f64 {
         self.eval(x).unwrap_or_else(|| f64::NAN)
     }
+
+    #[pyo3(name = "differentiate")]
+    fn differentiate_py(&self) -> Self {
+        self.differentiate()
+    }
+
+    #[pyo3(name = "integrate")]
+    fn integrate_py(&self, x0: f64, y0: f64) -> Self {
+        self.integrate(x0, y0)
+    }
 }
 
 
@@ -153,6 +167,11 @@ impl CubicSplineInterpolation {
     #[pyo3(name = "differentiate")]
     fn differentiate_py(&self) -> Self {
         self.differentiate()
+    }
+
+    #[pyo3(name = "integrate")]
+    fn integrate_py(&self, x0: f64, y0: f64) -> Self {
+        self.integrate(x0, y0)
     }
 }
 

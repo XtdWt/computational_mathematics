@@ -1,32 +1,4 @@
-use pyo3::prelude::*;
-use crate::interpolation::util::{Evaluatable};
-
-
-#[pyclass]
-pub struct LagrangePolynomial {
-    weights: Vec<f64>,
-    xs: Vec<f64>,
-    ys: Vec<f64>,
-    n: usize,
-}
-
-
-impl Evaluatable for LagrangePolynomial {
-    fn eval(&self, x: f64) -> Option<f64> {
-        for i in 0..self.n {
-            if self.xs[i] == x {
-                return Some(self.ys[i]);
-            }
-        }
-        let mut numerator = 0.0;
-        let mut denominator = 0.0;
-        for i in 0..self.n {
-            numerator += (self.weights[i] * self.ys[i])/(x - self.xs[i]);
-            denominator += self.weights[i]/(x - self.xs[i]);
-        }
-        Some(numerator/denominator)
-    }
-}
+use crate::interpolation::polynomial::LagrangePolynomial;
 
 
 pub fn barycentric_lagrange_interpolation(
@@ -48,7 +20,6 @@ pub fn barycentric_lagrange_interpolation(
         weights,
         xs,
         ys,
-        n,
     }
 }
 
@@ -56,6 +27,7 @@ pub fn barycentric_lagrange_interpolation(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::interpolation::polynomial::Evaluatable;
 
     #[test]
     fn test_interpolation_one_point() {

@@ -1,28 +1,4 @@
-use pyo3::prelude::*;
-use crate::interpolation::util::{Evaluatable};
-
-
-#[pyclass]
-pub struct NewtonsDividedDifferencePolynomial {
-    divided_differences: Vec<f64>,
-    xs: Vec<f64>,
-    n: usize,
-}
-
-
-impl Evaluatable for NewtonsDividedDifferencePolynomial {
-    fn eval(&self, x: f64) -> Option<f64> {
-        let mut total = 0.0;
-        for i in 0..self.n {
-            let mut c = self.divided_differences[i];
-            for j in 0..i {
-                c = c * (x - self.xs[j])
-            }
-            total += c;
-        }
-        Some(total)
-    }
-}
+use crate::interpolation::polynomial::NewtonsDividedDifferencePolynomial;
 
 
 pub fn newtons_divided_difference_interpolation(
@@ -48,7 +24,6 @@ pub fn newtons_divided_difference_interpolation(
     NewtonsDividedDifferencePolynomial{
         divided_differences,
         xs,
-        n,
     }
 }
 
@@ -56,6 +31,7 @@ pub fn newtons_divided_difference_interpolation(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::interpolation::polynomial::Evaluatable;
 
     #[test]
     fn test_interpolation_one_point() {
