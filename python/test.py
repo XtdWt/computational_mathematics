@@ -1,4 +1,4 @@
-from comp_math import (
+from computational_mathematics import (
     herons_method,
     bisection_method,
     barycentric_lagrange_interpolation,
