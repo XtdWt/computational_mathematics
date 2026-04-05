@@ -1,111 +1,14 @@
-use pyo3::prelude::*;
 use nalgebra::DMatrix;
 use crate::interpolation::util::cmp_f64;
-use crate::interpolation::polynomial::{Polynomial, Evaluatable, Differentiable, Integrable};
-
-
-#[pyclass]
-pub struct CubicSplineInterpolation {
-    pub x_ranges: Vec<(f64, f64)>,
-    pub y_functions: Vec<Polynomial>,
-}
-
-
-impl Evaluatable for CubicSplineInterpolation {
-    fn eval(&self, x: f64) -> Option<f64> {
-        if x < self.x_ranges[0].0 {
-            return self.y_functions[0].eval(x)
-        }
-        for i in 0..self.x_ranges.len() {
-            let x_min = self.x_ranges[i].0;
-            let x_max = self.x_ranges[i].1;
-            if x >= x_min && x <= x_max {
-                return self.y_functions[i].eval(x)
-            }
-        }
-        self.y_functions[self.y_functions.len()-1].eval(x)
-    }
-}
-
-
-impl Differentiable for CubicSplineInterpolation {
-    fn differentiate(&self) -> Self {
-        let mut diff_poly = Vec::new();
-        for polynomial in self.y_functions.iter() {
-            diff_poly.push(polynomial.differentiate())
-        }
-        CubicSplineInterpolation{
-            x_ranges: self.x_ranges.clone(),
-            y_functions: diff_poly,
-        }
-    }
-}
-
-
-impl Integrable for CubicSplineInterpolation {
-    fn integrate(&self, x0: f64, y0: f64) -> CubicSplineInterpolation {
-        let (i, p) = if x0 < self.x_ranges[0].0 {
-            (0, self.y_functions[0].integrate(x0, y0))
-        } else if x0 > self.x_ranges[self.x_ranges.len()-1].1 {
-            (self.x_ranges.len()-1, self.y_functions[self.y_functions.len()-1].integrate(x0, y0))
-        } else {
-            let mut i: usize = 0;
-            while i < self.x_ranges.len() {
-                let x_min = self.x_ranges[i].0;
-                let x_max = self.x_ranges[i].1;
-                if x0 >= x_min && x0 <= x_max {
-                    break
-                };
-                i += 1;
-            }
-            (i, self.y_functions[i].integrate(x0, y0))
-        };
-        println!("{:?}", p);
-        let mut integrated_functions = self.y_functions.clone();
-        integrated_functions[i] = p.clone();
-        println!("integrated functions: {:?}", integrated_functions);
-
-        // integrate from 0 to i
-        let mut j = (i-1) as i32;
-        let mut x_lower = self.x_ranges[i].0;
-        let mut y_lower = p.eval(x_lower).unwrap();
-        println!("x_lower: {:?}", x_lower);
-        println!("y_lower: {:?}", y_lower);
-        while j >= 0 {
-            let p_lower = self.y_functions[j as usize].integrate(x_lower, y_lower);
-            println!("p_lower: {:?}", p_lower);
-            x_lower = self.x_ranges[j as usize].0;
-            y_lower = p_lower.eval(x_lower).unwrap();
-            integrated_functions[j as usize] = p_lower;
-            j -= 1;
-        }
-        // integrate from i to n
-        let mut k = i+1;
-        let mut x_upper = self.x_ranges[i].1;
-        let mut y_upper = p.eval(x_upper).unwrap();
-        println!("x_upper: {:?}", x_upper);
-        println!("y_upper: {:?}", y_upper);
-        while k < self.x_ranges.len() {
-            let p_upper = self.y_functions[k].integrate(x_upper, y_upper);
-            println!("p_upper: {:?}", p_upper);
-            x_upper = self.x_ranges[k].1;
-            y_upper = p_upper.eval(x_upper).unwrap();
-            integrated_functions[k] = p_upper;
-            k += 1;
-        }
-        println!("integrated functions: {:?}", integrated_functions);
-        CubicSplineInterpolation {
-            x_ranges: self.x_ranges.clone(),
-            y_functions: integrated_functions,
-        }
-    }
-}
+use crate::interpolation::polynomial::{
+    Polynomial, PiecewisePolynomial
+};
 
 
 pub fn cubic_spline_interpolation(
     xs: Vec<f64>,
     ys: Vec<f64>
-) -> CubicSplineInterpolation {
+) -> PiecewisePolynomial {
     let (xs_sorted, ys_sorted): (Vec<f64>, Vec<f64>) = if !xs.is_sorted() {
         let mut joined: Vec<(f64, f64)> = xs.into_iter().zip(ys).collect();
         joined.sort_by(|joined0, joined1| cmp_f64(&joined0.0, &joined1.0));
@@ -161,7 +64,7 @@ pub fn cubic_spline_interpolation(
             }
         )
     }
-    CubicSplineInterpolation{
+    PiecewisePolynomial{
         x_ranges,
         y_functions,
     }
@@ -170,7 +73,9 @@ pub fn cubic_spline_interpolation(
 
 #[cfg(test)]
 mod tests {
-    use crate::interpolation::polynomial::Integrable;
+    use crate::interpolation::polynomial::{
+        Integrable, Differentiable, Evaluatable
+    };
     use super::*;
 
     #[test]
@@ -257,7 +162,7 @@ mod tests {
             weights: vec![1.0, 2.0, 3.0],
             x_i: 0.0
         };
-        let c = CubicSplineInterpolation{
+        let c = PiecewisePolynomial{
             x_ranges: vec![(-4.0, 4.0)],
             y_functions: vec![p],
         };
@@ -282,7 +187,7 @@ mod tests {
             weights: vec![-3.0, 2.0, 3.0, 4.0],
             x_i: 0.0
         };
-        let c = CubicSplineInterpolation{
+        let c = PiecewisePolynomial{
             x_ranges: vec![(-4.0, -1.0), (-1.0, 1.0), (1.0, 4.0)],
             y_functions: vec![p1, p2, p3],
         };
@@ -303,7 +208,7 @@ mod tests {
             weights: vec![1.0, 2.0, 3.0],
             x_i: 0.0
         };
-        let c = CubicSplineInterpolation{
+        let c = PiecewisePolynomial{
             x_ranges: vec![(3.0, 4.0)],
             y_functions: vec![p.clone()],
         };
