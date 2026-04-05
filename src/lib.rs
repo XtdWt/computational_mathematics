@@ -10,6 +10,7 @@ use crate::root_finding::newton_raphson_method::newton_raphson_method;
 mod interpolation;
 use crate::interpolation::polynomial::{
     Polynomial,
+    PiecewisePolynomial,
     LagrangePolynomial,
     NewtonsDividedDifferencePolynomial,
     Differentiable,
@@ -25,7 +26,6 @@ use crate::interpolation::newtons_divided_difference_interpolation::{
 use crate::interpolation::chebyshev_nodes::chebyshev_nodes;
 use crate::interpolation::cubic_spline_interpolation::{
     cubic_spline_interpolation,
-    CubicSplineInterpolation,
 };
 
 
@@ -159,7 +159,7 @@ impl Polynomial {
 
 
 #[pymethods]
-impl CubicSplineInterpolation {
+impl PiecewisePolynomial {
     fn __call__(&self, x: f64) -> f64 {
         self.eval(x).unwrap_or_else(|| f64::NAN)
     }
@@ -177,7 +177,7 @@ impl CubicSplineInterpolation {
 
 
 #[pyfunction(name = "cubic_spline_interpolation")]
-pub fn cubic_spline_interpolation_py(xs: Vec<f64>, ys: Vec<f64>) -> CubicSplineInterpolation {
+pub fn cubic_spline_interpolation_py(xs: Vec<f64>, ys: Vec<f64>) -> PiecewisePolynomial {
     cubic_spline_interpolation(xs, ys)
 }
 
@@ -193,7 +193,7 @@ fn comp_math(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(chebyshev_nodes_py, m)?)?;
     m.add_function(wrap_pyfunction!(cubic_spline_interpolation_py, m)?)?;
 
-    m.add_class::<CubicSplineInterpolation>()?;
+    m.add_class::<PiecewisePolynomial>()?;
     m.add_class::<Polynomial>()?;
     m.add_class::<LagrangePolynomial>()?;
     m.add_class::<NewtonsDividedDifferencePolynomial>()?;
