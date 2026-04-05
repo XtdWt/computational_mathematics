@@ -1,10 +1,10 @@
 [package]
-name = "comp_math"
+name = "computational_mathematics"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "comp_math"
+name = "computational_mathematics"
 crate-type = ["cdylib"]
 
 [dependencies]

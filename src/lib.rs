@@ -183,7 +183,7 @@ pub fn cubic_spline_interpolation_py(xs: Vec<f64>, ys: Vec<f64>) -> PiecewisePol
 
 
 #[pymodule]
-fn comp_math(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(herons_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(secant_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(bisection_method_py, m)?)?;
