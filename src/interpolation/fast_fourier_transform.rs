@@ -65,6 +65,28 @@ pub fn inverse_fast_fourier_transform(
 }
 
 
+pub fn fast_fourier_transform_frequencies(
+    n: usize,
+    d: f64,
+) -> Vec<f64> {
+    let divisor = (n as f64)*d;
+    let mut ts = Vec::new();
+    let mid_value = if n % 2 == 0 {
+        n/2
+    } else {
+        n/2+1
+    };
+
+    for i in 0..mid_value {
+        ts.push((i as f64)/divisor);
+    }
+    for i in (1..(n/2)+1).rev() {
+        ts.push(-(i as f64)/divisor);
+    }
+    ts
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -143,5 +165,35 @@ mod tests {
         let result_eight_points = fast_fourier_transform(test_xs.clone());
 
         assert_eq!(result_six_points, result_eight_points)
+    }
+
+    #[test]
+    fn test_fast_fourier_transform_frequencies_odd() {
+        let result = fast_fourier_transform_frequencies(5, 1.0);
+        assert_eq!(result, vec![0.0, 0.2, 0.4, -0.4, -0.2]);
+
+        let result = fast_fourier_transform_frequencies(3, 3.0_f64.recip());
+        assert_eq!(result, vec![0.0, 1.0, -1.0]);
+
+        let result = fast_fourier_transform_frequencies(1, 1.0);
+        assert_eq!(result, vec![0.0]);
+
+        let result = fast_fourier_transform_frequencies(7, 7.0_f64.recip());
+        assert_eq!(result, vec![0.0, 1.0, 2.0, 3.0, -3.0, -2.0, -1.0]);
+    }
+
+    #[test]
+    fn test_fast_fourier_transform_frequencies_even() {
+        let result = fast_fourier_transform_frequencies(4, 1.0);
+        assert_eq!(result, vec![0.0, 0.25, -0.5, -0.25]);
+
+        let result = fast_fourier_transform_frequencies(2, 1.0);
+        assert_eq!(result, vec![0.0, -0.5]);
+
+        let result = fast_fourier_transform_frequencies(6, 3.0_f64.recip());
+        assert_eq!(result, vec![0.0, 0.5, 1.0, -1.5, -1.0, -0.5]);
+
+        let result = fast_fourier_transform_frequencies(8, 1.0);
+        assert_eq!(result, vec![0.0, 0.125, 0.25, 0.375, -0.5, -0.375, -0.25, -0.125]);
     }
 }

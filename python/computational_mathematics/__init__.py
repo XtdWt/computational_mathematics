@@ -9,6 +9,7 @@ from .computational_mathematics import (
     cubic_spline_interpolation,
     fast_fourier_transform,
     inverse_fast_fourier_transform,
+    fast_fourier_transform_frequencies,
 )
 
 
@@ -23,4 +24,5 @@ __all__ = [
     "cubic_spline_interpolation",
     "fast_fourier_transform",
     "inverse_fast_fourier_transform",
+    "fast_fourier_transform_frequencies",
 ]
