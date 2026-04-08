@@ -1,3 +1,5 @@
+use num_complex::Complex;
+
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
 
@@ -27,7 +29,10 @@ use crate::interpolation::chebyshev_nodes::chebyshev_nodes;
 use crate::interpolation::cubic_spline_interpolation::{
     cubic_spline_interpolation,
 };
-
+use crate::interpolation::fast_fourier_transform::{
+    fast_fourier_transform,
+    inverse_fast_fourier_transform,
+};
 
 type Function = Box<dyn Fn(f64) -> f64>;
 
@@ -182,6 +187,22 @@ pub fn cubic_spline_interpolation_py(xs: Vec<f64>, ys: Vec<f64>) -> PiecewisePol
 }
 
 
+#[pyfunction(name = "fast_fourier_transform")]
+pub fn fast_fourier_transform_py(
+    xs: Vec<Complex<f64>>,
+) -> Vec<Complex<f64>> {
+    fast_fourier_transform(xs)
+}
+
+
+#[pyfunction(name = "inverse_fast_fourier_transform")]
+pub fn inverse_fast_fourier_transform_py(
+    xs: Vec<Complex<f64>>,
+) -> Vec<Complex<f64>> {
+    inverse_fast_fourier_transform(xs)
+}
+
+
 #[pymodule]
 fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(herons_method_py, m)?)?;
@@ -192,6 +213,8 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(newtons_divided_difference_interpolation_py, m)?)?;
     m.add_function(wrap_pyfunction!(chebyshev_nodes_py, m)?)?;
     m.add_function(wrap_pyfunction!(cubic_spline_interpolation_py, m)?)?;
+    m.add_function(wrap_pyfunction!(fast_fourier_transform_py, m)?)?;
+    m.add_function(wrap_pyfunction!(inverse_fast_fourier_transform_py, m)?)?;
 
     m.add_class::<PiecewisePolynomial>()?;
     m.add_class::<Polynomial>()?;

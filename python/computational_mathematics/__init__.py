@@ -7,6 +7,8 @@ from .computational_mathematics import (
     newtons_divided_difference_interpolation,
     chebyshev_nodes,
     cubic_spline_interpolation,
+    fast_fourier_transform,
+    inverse_fast_fourier_transform,
 )
 
 
@@ -19,4 +21,6 @@ __all__ = [
     "newtons_divided_difference_interpolation",
     "chebyshev_nodes",
     "cubic_spline_interpolation",
+    "fast_fourier_transform",
+    "inverse_fast_fourier_transform",
 ]
