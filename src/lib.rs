@@ -32,6 +32,7 @@ use crate::interpolation::cubic_spline_interpolation::{
 use crate::interpolation::fast_fourier_transform::{
     fast_fourier_transform,
     inverse_fast_fourier_transform,
+    fast_fourier_transform_frequencies,
 };
 
 type Function = Box<dyn Fn(f64) -> f64>;
@@ -203,6 +204,15 @@ pub fn inverse_fast_fourier_transform_py(
 }
 
 
+#[pyfunction(name = "fast_fourier_transform_frequencies")]
+pub fn fast_fourier_transform_frequencies_py(
+    n: usize,
+    d: f64,
+) -> Vec<f64> {
+    fast_fourier_transform_frequencies(n, d)
+}
+
+
 #[pymodule]
 fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(herons_method_py, m)?)?;
@@ -215,6 +225,7 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(cubic_spline_interpolation_py, m)?)?;
     m.add_function(wrap_pyfunction!(fast_fourier_transform_py, m)?)?;
     m.add_function(wrap_pyfunction!(inverse_fast_fourier_transform_py, m)?)?;
+    m.add_function(wrap_pyfunction!(fast_fourier_transform_frequencies_py, m)?)?;
 
     m.add_class::<PiecewisePolynomial>()?;
     m.add_class::<Polynomial>()?;
