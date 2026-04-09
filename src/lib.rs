@@ -35,6 +35,14 @@ use crate::interpolation::fast_fourier_transform::{
     fast_fourier_transform_frequencies,
 };
 
+mod calculus;
+use crate::calculus::differentiation::{
+    DerivativeType,
+    first_derivative,
+    second_derivative,
+};
+
+
 type Function = Box<dyn Fn(f64) -> f64>;
 
 
@@ -213,6 +221,63 @@ pub fn fast_fourier_transform_frequencies_py(
 }
 
 
+
+#[pyfunction(name = "first_derivative")]
+#[pyo3(signature = (function, x, h, method="central"))]
+pub fn first_derivative_py(
+    function: Py<PyAny>,
+    x: f64,
+    h: f64,
+    method: &str,
+) -> PyResult<f64> {
+    let f: Function = wrap_py_function(function);
+    let method_as_enum = if method == "backward" {
+        DerivativeType::Backward
+    } else if method == "forward" {
+        DerivativeType::Forward
+    } else if method == "central" {
+        DerivativeType::Central
+    } else {
+        return Err(
+            PyValueError::new_err(
+                "method: ".to_owned()
+                    + method
+                    + " must be one of ['backward', 'forward', 'central']"
+            )
+        )
+    };
+    Ok(first_derivative(f, x, h, method_as_enum))
+}
+
+
+#[pyfunction(name = "second_derivative")]
+#[pyo3(signature = (function, x, h, method="central"))]
+pub fn second_derivative_py(
+    function: Py<PyAny>,
+    x: f64,
+    h: f64,
+    method: &str,
+) -> PyResult<f64> {
+    let f: Function = wrap_py_function(function);
+    let method_as_enum = if method == "backward" {
+        DerivativeType::Backward
+    } else if method == "forward" {
+        DerivativeType::Forward
+    } else if method == "central" {
+        DerivativeType::Central
+    } else {
+        return Err(
+            PyValueError::new_err(
+                "method: ".to_owned()
+                    + method
+                    + " must be one of ['backward', 'forward', 'central']"
+            )
+        )
+    };
+    Ok(second_derivative(f, x, h, method_as_enum))
+}
+
+
 #[pymodule]
 fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(herons_method_py, m)?)?;
@@ -226,6 +291,8 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(fast_fourier_transform_py, m)?)?;
     m.add_function(wrap_pyfunction!(inverse_fast_fourier_transform_py, m)?)?;
     m.add_function(wrap_pyfunction!(fast_fourier_transform_frequencies_py, m)?)?;
+    m.add_function(wrap_pyfunction!(first_derivative_py, m)?)?;
+    m.add_function(wrap_pyfunction!(second_derivative_py, m)?)?;
 
     m.add_class::<PiecewisePolynomial>()?;
     m.add_class::<Polynomial>()?;
