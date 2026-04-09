@@ -36,11 +36,9 @@ use crate::interpolation::fast_fourier_transform::{
 };
 
 mod calculus;
-use crate::calculus::differentiation::{
-    DerivativeType,
-    first_derivative,
-    second_derivative,
-};
+use crate::calculus::util::{DerivativeType};
+use crate::calculus::first_derivative::first_derivative;
+use crate::calculus::second_derivative::second_derivative;
 
 
 type Function = Box<dyn Fn(f64) -> f64>;
