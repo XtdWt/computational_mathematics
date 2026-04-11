@@ -10,6 +10,8 @@ from .computational_mathematics import (
     fast_fourier_transform,
     inverse_fast_fourier_transform,
     fast_fourier_transform_frequencies,
+    first_derivative,
+    second_derivative,
 )
 
 
@@ -25,4 +27,6 @@ __all__ = [
     "fast_fourier_transform",
     "inverse_fast_fourier_transform",
     "fast_fourier_transform_frequencies",
+    "first_derivative",
+    "second_derivative",
 ]

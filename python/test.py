@@ -5,6 +5,7 @@ from computational_mathematics import (
     chebyshev_nodes,
     cubic_spline_interpolation,
     fast_fourier_transform,
+    second_derivative,
 )
 
 
@@ -28,3 +29,7 @@ if __name__ == "__main__":
     Xs = fast_fourier_transform([2, 3, 2, 3])
     print(Xs)
 
+    f = lambda x: x**3
+
+    ddf = second_derivative(f, 1, 0.001)
+    print(ddf)

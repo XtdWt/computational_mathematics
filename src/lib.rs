@@ -36,7 +36,7 @@ use crate::interpolation::fast_fourier_transform::{
 };
 
 mod calculus;
-use crate::calculus::util::{DerivativeType};
+use crate::calculus::util::DerivativeType;
 use crate::calculus::first_derivative::first_derivative;
 use crate::calculus::second_derivative::second_derivative;
 
