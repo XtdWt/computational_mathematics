@@ -39,6 +39,10 @@ mod calculus;
 use crate::calculus::util::DerivativeType;
 use crate::calculus::first_derivative::first_derivative;
 use crate::calculus::second_derivative::second_derivative;
+use crate::calculus::integration::{
+    composite_trapezoid_rule,
+    composite_simpsons_rule,
+};
 
 
 type Function = Box<dyn Fn(f64) -> f64>;
@@ -276,6 +280,32 @@ pub fn second_derivative_py(
 }
 
 
+#[pyfunction(name = "composite_trapezoid_rule")]
+#[pyo3(signature = (function, a, b, n_buckets=100))]
+pub fn composite_trapezoid_rule_py(
+    function: Py<PyAny>,
+    a: f64,
+    b: f64,
+    n_buckets: usize,
+) -> PyResult<f64> {
+    let f: Function = wrap_py_function(function);
+    Ok(composite_trapezoid_rule(f, a, b, n_buckets))
+}
+
+
+#[pyfunction(name = "composite_simpsons_rule")]
+#[pyo3(signature = (function, a, b, n_buckets=100))]
+pub fn composite_simpsons_rule_py(
+    function: Py<PyAny>,
+    a: f64,
+    b: f64,
+    n_buckets: usize,
+) -> PyResult<f64> {
+    let f: Function = wrap_py_function(function);
+    Ok(composite_simpsons_rule(f, a, b, n_buckets))
+}
+
+
 #[pymodule]
 fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(herons_method_py, m)?)?;
@@ -291,6 +321,8 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(fast_fourier_transform_frequencies_py, m)?)?;
     m.add_function(wrap_pyfunction!(first_derivative_py, m)?)?;
     m.add_function(wrap_pyfunction!(second_derivative_py, m)?)?;
+    m.add_function(wrap_pyfunction!(composite_trapezoid_rule_py, m)?)?;
+    m.add_function(wrap_pyfunction!(composite_simpsons_rule_py, m)?)?;
 
     m.add_class::<PiecewisePolynomial>()?;
     m.add_class::<Polynomial>()?;

@@ -1,6 +1,6 @@
 use crate::Function;
 
-fn composite_trapezoid_rule (
+pub fn composite_trapezoid_rule (
     f: Function,
     a: f64,
     b: f64,
@@ -19,7 +19,7 @@ fn composite_trapezoid_rule (
 }
 
 
-fn composite_simpsons_rule (
+pub fn composite_simpsons_rule (
     f: Function,
     a: f64,
     b: f64,

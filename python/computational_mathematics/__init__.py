@@ -12,6 +12,8 @@ from .computational_mathematics import (
     fast_fourier_transform_frequencies,
     first_derivative,
     second_derivative,
+    composite_trapezoid_rule,
+    composite_simpsons_rule,
 )
 
 
@@ -29,4 +31,6 @@ __all__ = [
     "fast_fourier_transform_frequencies",
     "first_derivative",
     "second_derivative",
+    "composite_trapezoid_rule",
+    "composite_simpsons_rule",
 ]
