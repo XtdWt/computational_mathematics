@@ -10,15 +10,19 @@ pub fn secant_method(
 ) -> f64 {
     let mut x0 = x_0;
     let mut x1 = x_1;
+
     for _ in 0..n_max {
-        let x_next = x1 - f(x1) * (x1 - x0)/(f(x1) - f(x0));
+        let f_x0 = f(x0);
+        let f_x1 = f(x1);
+        let x_next = x1 - f_x1 * (x1 - x0)/(f_x1 - f_x0);
+
         x0 = x1;
         if (x_next - x1).abs() < eps_tol {
             return x_next;
         }
         x1 = x_next;
     }
-    x1
+    return x1
 }
 
 
@@ -54,6 +58,15 @@ mod tests {
         let f = Box::new(|x: f64| x*x + 3.0*x - 3.0);
         assert!(
             secant_method(f, 1.0, 0.5, 5, 1e-6) - 0.79128784 < epsilon
+        )
+    }
+
+    #[test]
+    fn test_secant_method_tolerance_break() {
+        let f = Box::new(|x: f64| x*x + 3.0*x - 3.0);
+        assert_eq!(
+            secant_method(f.clone(), 1.0, 0.5, 5, 1.0),
+            secant_method(f, 1.0, 0.5, 1, 1e-6)
         )
     }
 }

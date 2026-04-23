@@ -11,16 +11,13 @@ pub fn newton_raphson_method(
     let mut x = x_0;
 
     for _ in 0..n_max {
-        let y = function(x);
-        let dydx = derivative(x);
-        let dx = - y/dydx;
-        let x_next = x + dx;
+        let x_next = x - function(x)/derivative(x);
         if (x_next - x).abs() < eps_tol {
             return x_next
         }
         x = x_next;
     }
-    x
+    return x
 }
 
 
@@ -64,6 +61,16 @@ mod tests {
         let df = Box::new(|_x: f64| 1.0);
         assert!(
             newton_raphson_method(f, df, 1.0, 20, 1e-6) + 3.0 < epsilon
+        )
+    }
+
+    #[test]
+    fn test_newton_raphson_method_tolerance_break() {
+        let f = Box::new(|x: f64| x + 3.0);
+        let df = Box::new(|_x: f64| 1.0);
+        assert_eq!(
+            newton_raphson_method(f.clone(), df.clone(), 1.0, 20, 1.0),
+            newton_raphson_method(f, df, 1.0, 1, 1e-6)
         )
     }
 }
