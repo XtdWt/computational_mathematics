@@ -28,4 +28,8 @@ jobs:
       run: cargo test --verbose
   
     - name: Maturin develop
-      run: maturin develop --release --python python3
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip maturin
+        maturin develop --release
