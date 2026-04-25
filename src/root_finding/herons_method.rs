@@ -1,11 +1,10 @@
 pub fn herons_method(a: f64, x_0: f64, n_max: usize) -> f64 {
     let mut x: f64 = x_0;
     for _ in 0..n_max {
-        x = 0.5 * (x + a/x);
+        x = 0.5 * (x + a / x);
     }
-    return x
+    return x;
 }
-
 
 #[cfg(test)]
 mod tests {
