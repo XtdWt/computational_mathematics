@@ -1,4 +1,5 @@
 use pyo3::pyclass;
+use rayon::prelude::*;
 
 pub trait Evaluatable {
     fn eval(&self, x: f64) -> Option<f64>;
@@ -98,12 +99,18 @@ impl Evaluatable for LagrangePolynomial {
                 return Some(self.ys[i]);
             }
         }
-        let mut numerator = 0.0;
-        let mut denominator = 0.0;
-        for i in 0..self.xs.len() {
-            numerator += (self.weights[i] * self.ys[i]) / (x - self.xs[i]);
-            denominator += self.weights[i] / (x - self.xs[i]);
-        }
+
+        let (numerator, denominator) = self
+            .xs
+            .par_iter()
+            .zip(&self.ys)
+            .zip(&self.weights)
+            .map(|((&xi, &yi), &wi)| {
+                let diff = x - xi;
+                (wi * yi / diff, wi / diff)
+            })
+            .reduce(|| (0.0, 0.0), |(n1, d1), (n2, d2)| (n1 + n2, d1 + d2));
+
         Some(numerator / denominator)
     }
 }
