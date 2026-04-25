@@ -22,14 +22,13 @@ pub struct Polynomial {
 
 impl Evaluatable for Polynomial {
     fn eval(&self, x: f64) -> Option<f64> {
-        let mut total = 0.0;
-        let x = x - self.x_i;
-        let mut x_power = 1.0;
-        for w in &self.weights {
-            total += w * x_power;
-            x_power *= x;
-        }
-        Some(total)
+        let f_x: f64 = self
+            .weights
+            .par_iter()
+            .enumerate()
+            .map(|(i, &w_i)| w_i * (x - self.x_i).powi(i as i32))
+            .sum();
+        return Some(f_x);
     }
 }
 
@@ -40,10 +39,10 @@ impl Differentiable for Polynomial {
             diff_weights.push(self.weights[i] * i as f64);
         }
 
-        Polynomial {
+        return Polynomial {
             weights: diff_weights,
             x_i: self.x_i,
-        }
+        };
     }
 }
 
@@ -61,7 +60,7 @@ impl Integrable for Polynomial {
         };
         let w_0 = y0 - definite_integral.eval(x0).unwrap();
         definite_integral.weights[0] = w_0;
-        definite_integral
+        return definite_integral;
     }
 }
 
@@ -81,7 +80,7 @@ impl Evaluatable for NewtonsDividedDifferencePolynomial {
             }
             total += c;
         }
-        Some(total)
+        return Some(total);
     }
 }
 
@@ -111,7 +110,7 @@ impl Evaluatable for LagrangePolynomial {
             })
             .reduce(|| (0.0, 0.0), |(n1, d1), (n2, d2)| (n1 + n2, d1 + d2));
 
-        Some(numerator / denominator)
+        return Some(numerator / denominator);
     }
 }
 
@@ -133,7 +132,7 @@ impl Evaluatable for PiecewisePolynomial {
                 return self.y_functions[i].eval(x);
             }
         }
-        self.y_functions[self.y_functions.len() - 1].eval(x)
+        return self.y_functions[self.y_functions.len() - 1].eval(x);
     }
 }
 
@@ -143,10 +142,10 @@ impl Differentiable for PiecewisePolynomial {
         for polynomial in self.y_functions.iter() {
             diff_poly.push(polynomial.differentiate())
         }
-        PiecewisePolynomial {
+        return PiecewisePolynomial {
             x_ranges: self.x_ranges.clone(),
             y_functions: diff_poly,
-        }
+        };
     }
 }
 
@@ -196,9 +195,9 @@ impl Integrable for PiecewisePolynomial {
             integrated_functions[k] = p_upper;
             k += 1;
         }
-        PiecewisePolynomial {
+        return PiecewisePolynomial {
             x_ranges: self.x_ranges.clone(),
             y_functions: integrated_functions,
-        }
+        };
     }
 }
