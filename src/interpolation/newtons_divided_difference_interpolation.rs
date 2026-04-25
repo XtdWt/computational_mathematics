@@ -1,6 +1,5 @@
 use crate::interpolation::polynomial::NewtonsDividedDifferencePolynomial;
 
-
 pub fn newtons_divided_difference_interpolation(
     xs: Vec<f64>,
     ys: Vec<f64>,
@@ -10,8 +9,10 @@ pub fn newtons_divided_difference_interpolation(
     divided_differences_table.push(ys);
     for i in 1..n {
         let mut di = Vec::new();
-        for j in 0..n-i {
-            let fx = (divided_differences_table[i-1][j+1] - divided_differences_table[i-1][j]) / (xs[j+i] - xs[j]);
+        for j in 0..n - i {
+            let fx = (divided_differences_table[i - 1][j + 1]
+                - divided_differences_table[i - 1][j])
+                / (xs[j + i] - xs[j]);
             di.push(fx);
         }
 
@@ -21,12 +22,11 @@ pub fn newtons_divided_difference_interpolation(
     for i in 0..n {
         divided_differences.push(divided_differences_table[i][0]);
     }
-    NewtonsDividedDifferencePolynomial{
+    return NewtonsDividedDifferencePolynomial {
         divided_differences,
         xs,
-    }
+    };
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -48,7 +48,7 @@ mod tests {
         let xs = vec![1.0, 2.0];
         let ys = vec![3.0, 5.0];
         let poly1 = newtons_divided_difference_interpolation(xs, ys);
-        let expected_fn = |x: f64| 2.0*x + 1.0;
+        let expected_fn = |x: f64| 2.0 * x + 1.0;
         for i in 0..5 {
             assert!((poly1.eval(i as f64).unwrap() - expected_fn(i as f64)).abs() < 1e-6);
         }
@@ -59,9 +59,12 @@ mod tests {
         let xs = vec![0.0, 2.0, 3.0];
         let ys = vec![1.0, 2.0, 4.0];
         let poly2 = newtons_divided_difference_interpolation(xs, ys);
-        let poly2_y_values = vec!(1.0, 1.0, 2.0, 4.0, 7.0);
+        let poly2_y_values = vec![1.0, 1.0, 2.0, 4.0, 7.0];
         for i in 0..5 {
-            assert_eq!((poly2.eval(i as f64).unwrap() - poly2_y_values[i]).abs() < 1e-6, true);
+            assert_eq!(
+                (poly2.eval(i as f64).unwrap() - poly2_y_values[i]).abs() < 1e-6,
+                true
+            );
         }
     }
 
@@ -70,9 +73,12 @@ mod tests {
         let xs = vec![0.0, 1.0, 2.0, 3.0, 4.0];
         let ys = vec![1.0, -1.0, 2.0, 4.0, 3.0];
         let poly2 = newtons_divided_difference_interpolation(xs, ys);
-        let poly2_y_values = vec!(1.0, -1.0, 2.0, 4.0, 3.0);
+        let poly2_y_values = vec![1.0, -1.0, 2.0, 4.0, 3.0];
         for i in 0..5 {
-            assert_eq!((poly2.eval(i as f64).unwrap() - poly2_y_values[i]).abs() < 1e-6, true);
+            assert_eq!(
+                (poly2.eval(i as f64).unwrap() - poly2_y_values[i]).abs() < 1e-6,
+                true
+            );
         }
         assert_eq!((poly2.eval(-1.0).unwrap() - 18.0).abs() < 1e-6, true);
         assert_eq!((poly2.eval(6.0).unwrap() - 4.0).abs() < 1e-6, true);
@@ -83,9 +89,12 @@ mod tests {
         let xs = vec![3.0, 2.0, 0.0];
         let ys = vec![4.0, 2.0, 1.0];
         let poly2 = newtons_divided_difference_interpolation(xs, ys);
-        let poly2_y_values = vec!(1.0, 1.0, 2.0, 4.0, 7.0);
+        let poly2_y_values = vec![1.0, 1.0, 2.0, 4.0, 7.0];
         for i in 0..5 {
-            assert_eq!((poly2.eval(i as f64).unwrap() - poly2_y_values[i]).abs() < 1e-6, true);
+            assert_eq!(
+                (poly2.eval(i as f64).unwrap() - poly2_y_values[i]).abs() < 1e-6,
+                true
+            );
         }
     }
 }
