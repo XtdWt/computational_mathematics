@@ -21,15 +21,14 @@ jobs:
       with:
         python-version: "3.14"
 
-    - name: Install maturin
-      run: pip install maturin
-
-    - name: Cargo test
+    - name: Testing Rust
       run: cargo test --verbose
-  
-    - name: Maturin develop
+
+    - name: Build and Testing Python
       run: |
         python -m venv venv
         source venv/bin/activate
         pip install --upgrade pip maturin
+        pip install --upgrade pip pytest
         maturin develop --release
+        pytest .\python\test.py --verbose
