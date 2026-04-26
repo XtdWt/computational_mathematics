@@ -123,8 +123,8 @@ pub fn chebyshev_nodes_py(a: f64, b: f64, n: usize) -> Vec<f64> {
 
 #[pymethods]
 impl Polynomial {
-    fn __call__(&self, x: f64) -> f64 {
-        self.eval(x).unwrap_or_else(|| f64::NAN)
+    fn __call__(&self, py: Python<'_>, x: f64) -> f64 {
+        return py.detach(|| { self.eval(x).unwrap_or_else(|| f64::NAN) });
     }
 
     #[pyo3(name = "differentiate")]
