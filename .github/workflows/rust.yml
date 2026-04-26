@@ -31,4 +31,4 @@ jobs:
         pip install --upgrade pip maturin
         pip install --upgrade pip pytest
         maturin develop --release
-        pytest .\python\test.py --verbose
+        pytest .\python\test.py -v

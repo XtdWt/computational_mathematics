@@ -1,16 +1,20 @@
+import pytest
 from computational_mathematics import (
-    herons_method,
-    bisection_method,
     barycentric_lagrange_interpolation,
+    bisection_method,
     chebyshev_nodes,
     cubic_spline_interpolation,
     fast_fourier_transform,
+    herons_method,
     second_derivative,
 )
 
 
+def test_herons_method():
+    assert herons_method(2, 2) == pytest.approx(2**0.5)
+
+
 if __name__ == "__main__":
-    print(herons_method(2, 2))
     print(bisection_method(lambda x: x**2 - 4, -1.1, -2.1, 1000))
 
     p = barycentric_lagrange_interpolation([0, 2, 3], [1, 2, 4])
