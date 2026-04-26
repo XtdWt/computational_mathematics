@@ -13,7 +13,7 @@ pub trait Integrable {
     fn integrate(&self, x0: f64, y0: f64) -> Self;
 }
 
-#[pyclass]
+#[pyclass(from_py_object)]
 #[derive(Clone, Debug)]
 pub struct Polynomial {
     pub weights: Vec<f64>,

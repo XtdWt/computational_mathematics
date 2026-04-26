@@ -1,13 +1,12 @@
 from computational_mathematics import (
-    herons_method,
-    bisection_method,
     barycentric_lagrange_interpolation,
+    bisection_method,
     chebyshev_nodes,
     cubic_spline_interpolation,
     fast_fourier_transform,
+    herons_method,
     second_derivative,
 )
-
 
 if __name__ == "__main__":
     print(herons_method(2, 2))
