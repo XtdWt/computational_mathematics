@@ -1,27 +1,28 @@
 use crate::interpolation::polynomial::NewtonsDividedDifferencePolynomial;
+use rayon::prelude::*;
 
 pub fn newtons_divided_difference_interpolation(
     xs: Vec<f64>,
     ys: Vec<f64>,
 ) -> NewtonsDividedDifferencePolynomial {
-    let mut divided_differences_table = Vec::new();
+    let mut divided_differences_table = vec![ys];
     let n = xs.len();
-    divided_differences_table.push(ys);
     for i in 1..n {
-        let mut di = Vec::new();
-        for j in 0..n - i {
-            let fx = (divided_differences_table[i - 1][j + 1]
-                - divided_differences_table[i - 1][j])
-                / (xs[j + i] - xs[j]);
-            di.push(fx);
-        }
+        divided_differences_table.push(
+            (0..n - i)
+                .into_par_iter()
+                .map(|j| {
+                    (divided_differences_table[i - 1][j + 1] - divided_differences_table[i - 1][j])
+                        / (xs[j + i] - xs[j])
+                })
+                .collect(),
+        );
+    }
 
-        divided_differences_table.push(di);
-    }
-    let mut divided_differences = Vec::new();
-    for i in 0..n {
-        divided_differences.push(divided_differences_table[i][0]);
-    }
+    let divided_differences = divided_differences_table
+        .into_par_iter()
+        .map(|table_i| table_i[0])
+        .collect();
     return NewtonsDividedDifferencePolynomial {
         divided_differences,
         xs,
