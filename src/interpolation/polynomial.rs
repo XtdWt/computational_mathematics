@@ -34,10 +34,10 @@ impl Evaluatable for Polynomial {
 
 impl Differentiable for Polynomial {
     fn differentiate(&self) -> Self {
-        let mut diff_weights = Vec::new();
-        for i in 1..self.weights.len() {
-            diff_weights.push(self.weights[i] * i as f64);
-        }
+        let diff_weights = (1..self.weights.len())
+            .into_par_iter()
+            .map(|i| self.weights[i] * i as f64)
+            .collect();
 
         return Polynomial {
             weights: diff_weights,
@@ -48,12 +48,8 @@ impl Differentiable for Polynomial {
 
 impl Integrable for Polynomial {
     fn integrate(&self, x0: f64, y0: f64) -> Self {
-        let mut int_weights = Vec::new();
-        int_weights.push(0.0);
-        for i in 0..self.weights.len() {
-            int_weights.push(self.weights[i] / (i + 1) as f64);
-        }
-
+        let mut int_weights: Vec<f64> = vec![0.0];
+        int_weights.extend(self.weights.par_iter().enumerate().map(|(i, &w)| {w / (i + 1) as f64}).collect::<Vec<f64>>().into_iter());
         let mut definite_integral = Polynomial {
             weights: int_weights,
             x_i: self.x_i,
@@ -72,15 +68,13 @@ pub struct NewtonsDividedDifferencePolynomial {
 
 impl Evaluatable for NewtonsDividedDifferencePolynomial {
     fn eval(&self, x: f64) -> Option<f64> {
-        let mut total = 0.0;
-        for i in 0..self.xs.len() {
-            let mut c = self.divided_differences[i];
-            for j in 0..i {
-                c = c * (x - self.xs[j])
-            }
-            total += c;
-        }
-        return Some(total);
+        return Some(
+            self.divided_differences
+            .par_iter()
+            .enumerate()
+            .map(|(i, &c)| {c * self.xs[..i].iter().map(|&xj|x - xj).product::<f64>()})
+            .sum()
+        );
     }
 }
 
@@ -138,10 +132,10 @@ impl Evaluatable for PiecewisePolynomial {
 
 impl Differentiable for PiecewisePolynomial {
     fn differentiate(&self) -> Self {
-        let mut diff_poly = Vec::new();
-        for polynomial in self.y_functions.iter() {
-            diff_poly.push(polynomial.differentiate())
-        }
+        let diff_poly = self.y_functions
+            .par_iter()
+            .map(|f| f.differentiate())
+            .collect();
         return PiecewisePolynomial {
             x_ranges: self.x_ranges.clone(),
             y_functions: diff_poly,
