@@ -1,14 +1,8 @@
-use nalgebra::DMatrix;
+use crate::interpolation::polynomial::{PiecewisePolynomial, Polynomial};
 use crate::interpolation::util::cmp_f64;
-use crate::interpolation::polynomial::{
-    Polynomial, PiecewisePolynomial
-};
+use nalgebra::DMatrix;
 
-
-pub fn cubic_spline_interpolation(
-    xs: Vec<f64>,
-    ys: Vec<f64>
-) -> PiecewisePolynomial {
+pub fn cubic_spline_interpolation(xs: Vec<f64>, ys: Vec<f64>) -> PiecewisePolynomial {
     let (xs_sorted, ys_sorted): (Vec<f64>, Vec<f64>) = if !xs.is_sorted() {
         let mut joined: Vec<(f64, f64)> = xs.into_iter().zip(ys).collect();
         joined.sort_by(|joined0, joined1| cmp_f64(&joined0.0, &joined1.0));
@@ -18,65 +12,58 @@ pub fn cubic_spline_interpolation(
     };
     let a_i = ys_sorted;
     let mut h_i = Vec::new();
-    for i in 0..(xs_sorted.len()-1) {
-        h_i.push(xs_sorted[i+1] - xs_sorted[i]);
+    for i in 0..(xs_sorted.len() - 1) {
+        h_i.push(xs_sorted[i + 1] - xs_sorted[i]);
     }
-    #[allow(non_snake_case)] let mut A = DMatrix::zeros(
-        xs_sorted.len(), xs_sorted.len()
-    );
+    #[allow(non_snake_case)]
+    let mut A = DMatrix::zeros(xs_sorted.len(), xs_sorted.len());
     let mut b = DMatrix::zeros(xs_sorted.len(), 1);
 
     for i in 0..xs_sorted.len() {
-        if i == 0 || i == xs_sorted.len()-1 {
+        if i == 0 || i == xs_sorted.len() - 1 {
             A[(i, i)] = 1.0;
             b[(i, 0)] = 0.0;
-
         } else {
-            A[(i, i-1)] = h_i[i-1];
-            A[(i, i)] = (h_i[i-1] + h_i[i])*2.0;
-            A[(i, i+1)] = h_i[i];
-            b[(i, 0)] = (3.0/h_i[i]) * (a_i[i+1] - a_i[i]) - (3.0/h_i[i-1]) * (a_i[i] - a_i[i-1]);
+            A[(i, i - 1)] = h_i[i - 1];
+            A[(i, i)] = (h_i[i - 1] + h_i[i]) * 2.0;
+            A[(i, i + 1)] = h_i[i];
+            b[(i, 0)] =
+                (3.0 / h_i[i]) * (a_i[i + 1] - a_i[i]) - (3.0 / h_i[i - 1]) * (a_i[i] - a_i[i - 1]);
         }
     }
-    let c_i: Vec<f64> = (A.try_inverse().unwrap() * b).column(0).iter().cloned().collect();
+    let c_i: Vec<f64> = (A.try_inverse().unwrap() * b)
+        .column(0)
+        .iter()
+        .cloned()
+        .collect();
     let mut b_i = Vec::new();
     let mut d_i = Vec::new();
-    for i in 0..(xs_sorted.len()-1) {
+    for i in 0..(xs_sorted.len() - 1) {
         b_i.push(
-            (1.0/h_i[i])*(a_i[i+1] - a_i[i]) - ((h_i[i]/3.0)*(2.0*c_i[i] + c_i[i+1]))
+            (1.0 / h_i[i]) * (a_i[i + 1] - a_i[i]) - ((h_i[i] / 3.0) * (2.0 * c_i[i] + c_i[i + 1])),
         );
-        d_i.push(
-            (c_i[i+1]-c_i[i])/(3.0*h_i[i])
-        );
+        d_i.push((c_i[i + 1] - c_i[i]) / (3.0 * h_i[i]));
     }
     let mut x_ranges = Vec::new();
     for i in 1..xs_sorted.len() {
-        x_ranges.push((xs_sorted[i-1], xs_sorted[i]));
+        x_ranges.push((xs_sorted[i - 1], xs_sorted[i]));
     }
     let mut y_functions = Vec::new();
-    for i in 0..(xs_sorted.len()-1) {
+    for i in 0..(xs_sorted.len() - 1) {
         let weights = vec![a_i[i], b_i[i], c_i[i], d_i[i]];
         let x_i = xs_sorted[i];
-        y_functions.push(
-            Polynomial{
-                weights,
-                x_i
-            }
-        )
+        y_functions.push(Polynomial { weights, x_i })
     }
-    PiecewisePolynomial{
+    return PiecewisePolynomial {
         x_ranges,
         y_functions,
-    }
+    };
 }
-
 
 #[cfg(test)]
 mod tests {
-    use crate::interpolation::polynomial::{
-        Integrable, Differentiable, Evaluatable
-    };
     use super::*;
+    use crate::interpolation::polynomial::{Differentiable, Evaluatable, Integrable};
 
     #[test]
     fn test_cubic_spline_interpolation_two_points() {
@@ -99,7 +86,7 @@ mod tests {
         assert_eq!(c.eval(1.0).unwrap(), 0.0);
         assert_eq!(c.eval(2.0).unwrap(), 3.0);
         assert_eq!(c.eval(0.5).unwrap(), 1.75);
-        assert_eq!((c.eval(1.8).unwrap() -  2.016).abs() < 1e-6, true);
+        assert_eq!((c.eval(1.8).unwrap() - 2.016).abs() < 1e-6, true);
     }
 
     #[test]
@@ -132,12 +119,12 @@ mod tests {
 
     #[test]
     fn test_cubic_spline_interpolation_polynomial_differentiation() {
-        let p = Polynomial{
+        let p = Polynomial {
             weights: vec![1.0, 2.0, 3.0],
-            x_i: 0.0
+            x_i: 0.0,
         };
         let p_diff = p.differentiate();
-        let derivative = |x: f64| 2.0 + 6.0*x;
+        let derivative = |x: f64| 2.0 + 6.0 * x;
         for i in -3..3 {
             assert_eq!(p_diff.eval(i as f64).unwrap(), derivative(i as f64));
         }
@@ -145,12 +132,12 @@ mod tests {
 
     #[test]
     fn test_cubic_spline_interpolation_polynomial_integration() {
-        let p = Polynomial{
+        let p = Polynomial {
             weights: vec![1.0, 2.0, 3.0],
-            x_i: 0.0
+            x_i: 0.0,
         };
         let p_integral = p.integrate(0.0, 1.0);
-        let integral = |x: f64| 1.0 + x + x*x + x*x*x;
+        let integral = |x: f64| 1.0 + x + x * x + x * x * x;
         for i in -3..3 {
             assert_eq!(p_integral.eval(i as f64).unwrap(), integral(i as f64));
         }
@@ -158,16 +145,16 @@ mod tests {
 
     #[test]
     fn test_cubic_spline_interpolation_spline_differentiation() {
-        let p = Polynomial{
+        let p = Polynomial {
             weights: vec![1.0, 2.0, 3.0],
-            x_i: 0.0
+            x_i: 0.0,
         };
-        let c = PiecewisePolynomial{
+        let c = PiecewisePolynomial {
             x_ranges: vec![(-4.0, 4.0)],
             y_functions: vec![p],
         };
         let c_derivative = c.differentiate();
-        let derivative = |x: f64| 2.0 + 6.0*x;
+        let derivative = |x: f64| 2.0 + 6.0 * x;
         for i in -3..3 {
             assert_eq!(c_derivative.eval(i as f64).unwrap(), derivative(i as f64));
         }
@@ -175,19 +162,19 @@ mod tests {
 
     #[test]
     fn test_cubic_spline_interpolation_spline_integration() {
-        let p1 = Polynomial{
+        let p1 = Polynomial {
             weights: vec![4.0, 2.0],
-            x_i: 0.0
+            x_i: 0.0,
         };
-        let p2 = Polynomial{
+        let p2 = Polynomial {
             weights: vec![1.0, 2.0, 3.0],
-            x_i: 0.0
+            x_i: 0.0,
         };
-        let p3 = Polynomial{
+        let p3 = Polynomial {
             weights: vec![-3.0, 2.0, 3.0, 4.0],
-            x_i: 0.0
+            x_i: 0.0,
         };
-        let c = PiecewisePolynomial{
+        let c = PiecewisePolynomial {
             x_ranges: vec![(-4.0, -1.0), (-1.0, 1.0), (1.0, 4.0)],
             y_functions: vec![p1, p2, p3],
         };
@@ -204,11 +191,11 @@ mod tests {
 
     #[test]
     fn test_cubic_spline_interpolation_extrapolate() {
-        let p = Polynomial{
+        let p = Polynomial {
             weights: vec![1.0, 2.0, 3.0],
-            x_i: 0.0
+            x_i: 0.0,
         };
-        let c = PiecewisePolynomial{
+        let c = PiecewisePolynomial {
             x_ranges: vec![(3.0, 4.0)],
             y_functions: vec![p.clone()],
         };

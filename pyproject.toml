@@ -19,3 +19,6 @@ python-source = "python"
 
 [tool.setuptools.dynamic]
 readme = {file = "README.md", content-type = "text/markdown"}
+
+[tool.ruff.lint]
+ignore = ["E731"]

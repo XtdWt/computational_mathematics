@@ -1,11 +1,6 @@
 pub fn herons_method(a: f64, x_0: f64, n_max: usize) -> f64 {
-    let mut x: f64 = x_0;
-    for _ in 0..n_max {
-        x = 0.5 * (x + a/x);
-    }
-    x
+    return (0..n_max).fold(x_0, |total, _| 0.5 * (total + a / total));
 }
-
 
 #[cfg(test)]
 mod tests {

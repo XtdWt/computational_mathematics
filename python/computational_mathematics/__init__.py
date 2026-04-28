@@ -1,21 +1,20 @@
 from .computational_mathematics import (
-    herons_method,
-    bisection_method,
-    newton_raphson_method,
-    secant_method,
     barycentric_lagrange_interpolation,
-    newtons_divided_difference_interpolation,
+    bisection_method,
     chebyshev_nodes,
+    composite_simpsons_rule,
+    composite_trapezoid_rule,
     cubic_spline_interpolation,
     fast_fourier_transform,
-    inverse_fast_fourier_transform,
     fast_fourier_transform_frequencies,
     first_derivative,
+    herons_method,
+    inverse_fast_fourier_transform,
+    newton_raphson_method,
+    newtons_divided_difference_interpolation,
+    secant_method,
     second_derivative,
-    composite_trapezoid_rule,
-    composite_simpsons_rule,
 )
-
 
 __all__ = [
     "herons_method",
