@@ -1,3 +1,5 @@
+use rayon::prelude::*;
+
 use crate::Function;
 
 pub fn composite_trapezoid_rule (
@@ -7,15 +9,13 @@ pub fn composite_trapezoid_rule (
     n_buckets: usize,
 ) -> f64 {
     let step = (b-a)/n_buckets as f64;
-
-    let mut total = 0.0;
-    for i in 1..n_buckets {
-        let x1 = a + i as f64 * step;
-        let x2 = a + (i as f64 - 1.0) * step;
-        total += step * f(x1) / 2.0;
-        total += step * f(x2) / 2.0;
-    }
-    total
+    return (1..n_buckets)
+        .into_par_iter()
+        .flat_map(|i| { vec![a + i as f64 * step, a + (i as f64 - 1.0) * step] } )
+        .collect::<Vec<f64>>()
+        .into_iter()
+        .map(|i| {step * f(i) / 2.0})
+        .sum();
 }
 
 
@@ -27,16 +27,13 @@ pub fn composite_simpsons_rule (
 ) -> f64 {
     let step = (b-a)/n_buckets as f64;
 
-    let mut total = 0.0;
-    for i in 1..n_buckets/2 {
-        let x1 = a + 2.0 * i as f64 * step;
-        let x2 = a + (2.0 * i as f64 - 1.0) * step;
-        let x3 = a + (2.0 * i as f64 - 2.0) * step;
-        total += step * f(x1) / 3.0;
-        total += step * f(x2) / 3.0;
-        total += step * f(x3) / 3.0;
-    }
-    total
+    return (1..n_buckets/2)
+        .into_par_iter()
+        .flat_map(|i| { vec![a + 2.0 * i as f64 * step, a + (2.0 * i as f64 - 1.0) * step, a + (2.0 * i as f64 - 2.0) * step] } )
+        .collect::<Vec<f64>>()
+        .into_iter()
+        .map(|i| {step * f(i) / 3.0})
+        .sum();
 }
 
 
