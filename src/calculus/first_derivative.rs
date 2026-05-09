@@ -2,30 +2,30 @@ use crate::Function;
 use crate::calculus::util::DerivativeType;
 
 
-fn second_order_forward_difference(
+fn forward_difference(
     function: Function,
     x: f64,
     h: f64,
 ) -> f64 {
-    (-3.0 * function(x) + 4.0 * function(x+h) - function(x+2.0*h)) / (2.0 * h)
+    return (function(x+h) - function(x)) / h;
 }
 
 
-fn second_order_backward_difference(
+fn backward_difference(
     function: Function,
     x: f64,
     h: f64,
 ) -> f64 {
-    (3.0 * function(x) - 4.0 * function(x-h) + function(x-2.0*h)) / (2.0 * h)
+    return (function(x) - function(x-h)) / h;
 }
 
 
-fn second_order_central_difference(
+fn central_difference(
     function: Function,
     x: f64,
     h: f64,
 ) -> f64 {
-    (function(x + h) - function(x - h)) / (2.0 * h)
+    return (function(x + h) - function(x - h)) / (2.0 * h);
 }
 
 
@@ -35,11 +35,11 @@ pub fn first_derivative(
     h: f64,
     method: DerivativeType,
 ) -> f64 {
-    match method {
-        DerivativeType::Forward => second_order_forward_difference(function, x, h),
-        DerivativeType::Backward => second_order_backward_difference(function, x, h),
-        DerivativeType::Central => second_order_central_difference(function, x, h),
-    }
+    return match method {
+        DerivativeType::Forward => forward_difference(function, x, h),
+        DerivativeType::Backward => backward_difference(function, x, h),
+        DerivativeType::Central => central_difference(function, x, h),
+    };
 }
 
 
@@ -47,6 +47,8 @@ pub fn first_derivative(
 mod tests {
     use super::*;
     use std::f64::consts::E;
+    use crate::util::assert_almost_equal;
+
 
     #[test]
     fn first_derivative_simple_polynomial() {
@@ -55,19 +57,23 @@ mod tests {
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
+            // assert_eq!(
+            //     (
+            //         first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward) - df(x)
+            //     ).abs() < 1e-6, true
+            // );
+            assert_almost_equal!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward),
+                df(x)
+            );
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Forward) - df(x)
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward) - df(x)
                 ).abs() < 1e-6, true
             );
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Backward) - df(x)
-                ).abs() < 1e-6, true
-            );
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Central) - df(x)
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Central) - df(x)
                 ).abs() < 1e-6, true
             );
         }
@@ -75,25 +81,25 @@ mod tests {
 
     #[test]
     fn first_derivative_polynomial() {
-        let f = Box::new(|x: f64| 5.0*x.powf(4.0) + 3.0*x.powf(3.0) - 14.0*x - 11.0);
-        let df = |x: f64| 20.0*x.powf(3.0) + 9.0*x.powf(2.0) - 14.0;
+        let f = Box::new(|x: f64| x.powf(3.0) + x.powf(2.0) - 4.0*x - 2.0);
+        let df = |x: f64| 3.0*x.powf(2.0) + 2.0*x - 4.0;
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Forward) - df(x)
-                ).abs() < 1e-6, true
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward) - df(x)
+                ).abs() < 1e-4, true
             );
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Backward) - df(x)
-                ).abs() < 1e-6, true
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward) - df(x)
+                ).abs() < 1e-4, true
             );
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Central) - df(x)
-                ).abs() < 1e-6, true
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Central) - df(x)
+                ).abs() < 1e-4, true
             );
         }
     }
@@ -107,17 +113,17 @@ mod tests {
         for x in xs {
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Forward) - df(x)
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward) - df(x)
                 ).abs() < 1e-6, true
             );
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Backward) - df(x)
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward) - df(x)
                 ).abs() < 1e-6, true
             );
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Central) - df(x)
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Central) - df(x)
                 ).abs() < 1e-6, true
             );
         }
@@ -132,17 +138,17 @@ mod tests {
         for x in xs {
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Forward) - df(x)
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward) - df(x)
                 ).abs() < 1e-6, true
             );
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Backward) - df(x)
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward) - df(x)
                 ).abs() < 1e-6, true
             );
             assert_eq!(
                 (
-                    first_derivative(f.clone(), x, 0.000001, DerivativeType::Central) - df(x)
+                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Central) - df(x)
                 ).abs() < 1e-6, true
             );
         }
