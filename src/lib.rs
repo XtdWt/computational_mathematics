@@ -38,6 +38,28 @@ fn wrap_py_function(py_function: Py<PyAny>) -> Function {
     })
 }
 
+
+#[macro_export]
+macro_rules! assert_almost_eq {
+    ($a:expr, $b:expr, $eps:expr) => {
+        if ($a - $b).abs() > $eps {
+            panic!(
+                "assertion `|left - right| <= eps` failed \n difference={} > epsilon={}", ($a - $b).abs(), $eps
+            )
+        }
+    };
+
+    //epsilon default value of 1e-7
+    ($a:expr, $b:expr) => {
+        if ($a - $b).abs() > 1e-7 {
+            panic!(
+                "assertion `|left - right| <= eps` failed \n difference={} > epsilon={}", ($a - $b).abs(), 1e-7
+            )
+        }
+    };
+}
+
+
 #[pyfunction(name = "herons_method")]
 #[pyo3(signature = (a, x_0 = 1.0, n_max=100))]
 pub fn herons_method_py(a: f64, x_0: f64, n_max: usize) -> f64 {
