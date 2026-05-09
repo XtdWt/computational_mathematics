@@ -47,7 +47,7 @@ pub fn first_derivative(
 mod tests {
     use super::*;
     use std::f64::consts::E;
-    use crate::util::assert_almost_equal;
+    use crate::assert_almost_eq;
 
 
     #[test]
@@ -57,24 +57,20 @@ mod tests {
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
-            // assert_eq!(
-            //     (
-            //         first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward) - df(x)
-            //     ).abs() < 1e-6, true
-            // );
-            assert_almost_equal!(
+            assert_almost_eq!(
                 first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward),
-                df(x)
+                df(x),
+                1e-6
             );
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward) - df(x)
-                ).abs() < 1e-6, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward),
+                df(x),
+                1e-6
             );
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Central) - df(x)
-                ).abs() < 1e-6, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Central),
+                df(x),
+                1e-6
             );
         }
     }
@@ -86,20 +82,20 @@ mod tests {
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward) - df(x)
-                ).abs() < 1e-4, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward),
+                df(x),
+                1e-4
             );
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward) - df(x)
-                ).abs() < 1e-4, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward),
+                df(x),
+                1e-4
             );
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Central) - df(x)
-                ).abs() < 1e-4, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Central),
+                df(x),
+                1e-4
             );
         }
     }
@@ -111,20 +107,20 @@ mod tests {
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward) - df(x)
-                ).abs() < 1e-6, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward),
+                df(x),
+                1e-6
             );
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward) - df(x)
-                ).abs() < 1e-6, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward),
+                df(x),
+                1e-6
             );
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Central) - df(x)
-                ).abs() < 1e-6, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Central),
+                df(x),
+                1e-6
             );
         }
     }
@@ -136,20 +132,20 @@ mod tests {
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward) - df(x)
-                ).abs() < 1e-6, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Forward),
+                df(x),
+                1e-6
             );
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward) - df(x)
-                ).abs() < 1e-6, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Backward),
+                df(x),
+                1e-6
             );
-            assert_eq!(
-                (
-                    first_derivative(f.clone(), x, 1e-8, DerivativeType::Central) - df(x)
-                ).abs() < 1e-6, true
+            assert_almost_eq!(
+                first_derivative(f.clone(), x, 1e-8, DerivativeType::Central),
+                df(x),
+                1e-6
             );
         }
     }
