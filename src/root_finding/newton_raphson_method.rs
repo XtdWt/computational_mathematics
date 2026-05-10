@@ -21,7 +21,9 @@ pub fn newton_raphson_method(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::assert_almost_eq;
+
+use super::*;
 
     #[test]
     fn test_newton_raphson_method_one_iteration() {
@@ -35,26 +37,23 @@ mod tests {
 
     #[test]
     fn test_newton_raphson_method_two_iteration() {
-        let epsilon = 1e-6;
         let f = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
         let df = Box::new(|x: f64| 2.0 * x + 3.0);
-        assert!(newton_raphson_method(f, df, 1.0, 2, 1e-6) - 0.8 - (0.04 / 4.6) < epsilon)
+        assert_almost_eq!(newton_raphson_method(f.clone(), df.clone(), 1.0, 2, 1e-6), 0.8 - (0.04 / 4.6));
     }
 
     #[test]
     fn test_newton_raphson_method_many_iteration() {
-        let epsilon = 1e-6;
         let f = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
         let df = Box::new(|x: f64| 2.0 * x + 3.0);
-        assert!(newton_raphson_method(f, df, 1.0, 20, 1e-6) - 0.79128784 < epsilon)
+        assert_almost_eq!(newton_raphson_method(f.clone(), df.clone(), 1.0, 20, 1e-6), 0.79128784);
     }
 
     #[test]
     fn test_newton_raphson_method_simple() {
-        let epsilon = 1e-6;
         let f = Box::new(|x: f64| x + 3.0);
         let df = Box::new(|_x: f64| 1.0);
-        assert!(newton_raphson_method(f, df, 1.0, 20, 1e-6) + 3.0 < epsilon)
+        assert_almost_eq!(newton_raphson_method(f.clone(), df.clone(), 1.0, 20, 1e-6), -3.0);
     }
 
     #[test]

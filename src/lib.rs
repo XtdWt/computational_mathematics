@@ -44,7 +44,7 @@ macro_rules! assert_almost_eq {
     ($a:expr, $b:expr, $eps:expr) => {
         if ($a - $b).abs() > $eps {
             panic!(
-                "assertion `|left - right| <= eps` failed \n difference={} > epsilon={}", ($a - $b).abs(), $eps
+                "assertion `|left - right| <= eps` failed for\n left={} \n right={} \n difference={} > epsilon={}", $a, $b, ($a - $b).abs(), $eps
             )
         }
     };
