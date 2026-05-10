@@ -18,6 +18,7 @@ pub fn chebyshev_nodes(a: f64, b: f64, n: usize) -> Vec<f64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::assert_almost_eq;
 
     #[test]
     fn chebyshev_nodes_0_1_one_node() {
@@ -30,7 +31,7 @@ mod tests {
         let nodes = chebyshev_nodes(0.0, 1.0, 2);
         let expected_nodes = vec![0.14644661, 0.85355339];
         for (node, expected_node) in nodes.into_iter().zip(expected_nodes) {
-            assert_eq!((node - expected_node).abs() < 1e-6, true);
+            assert_almost_eq!(node, expected_node);
         }
     }
 
@@ -39,7 +40,7 @@ mod tests {
         let nodes = chebyshev_nodes(0.0, 1.0, 3);
         let expected_nodes = vec![0.0669873, 0.5, 0.9330127];
         for (node, expected_node) in nodes.into_iter().zip(expected_nodes) {
-            assert_eq!((node - expected_node).abs() < 1e-6, true);
+            assert_almost_eq!(node, expected_node);
         }
     }
 
@@ -48,7 +49,7 @@ mod tests {
         let nodes = chebyshev_nodes(0.0, 10.0, 5);
         let expected_nodes = vec![0.24471742, 2.06107374, 5.0, 7.93892626, 9.75528258];
         for (node, expected_node) in nodes.into_iter().zip(expected_nodes) {
-            assert_eq!((node - expected_node).abs() < 1e-6, true);
+            assert_almost_eq!(node, expected_node);
         }
     }
 }

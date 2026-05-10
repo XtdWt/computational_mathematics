@@ -32,7 +32,7 @@ pub fn newtons_divided_difference_interpolation(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::interpolation::polynomial::Evaluatable;
+    use crate::{assert_almost_eq, interpolation::polynomial::Evaluatable};
 
     #[test]
     fn test_interpolation_one_point() {
@@ -51,7 +51,7 @@ mod tests {
         let poly1 = newtons_divided_difference_interpolation(xs, ys);
         let expected_fn = |x: f64| 2.0 * x + 1.0;
         for i in 0..5 {
-            assert!((poly1.eval(i as f64).unwrap() - expected_fn(i as f64)).abs() < 1e-6);
+            assert_almost_eq!(poly1.eval(i as f64).unwrap(), expected_fn(i as f64));
         }
     }
 
@@ -62,10 +62,7 @@ mod tests {
         let poly2 = newtons_divided_difference_interpolation(xs, ys);
         let poly2_y_values = vec![1.0, 1.0, 2.0, 4.0, 7.0];
         for i in 0..5 {
-            assert_eq!(
-                (poly2.eval(i as f64).unwrap() - poly2_y_values[i]).abs() < 1e-6,
-                true
-            );
+            assert_almost_eq!(poly2.eval(i as f64).unwrap(), poly2_y_values[i]);
         }
     }
 
@@ -76,13 +73,10 @@ mod tests {
         let poly2 = newtons_divided_difference_interpolation(xs, ys);
         let poly2_y_values = vec![1.0, -1.0, 2.0, 4.0, 3.0];
         for i in 0..5 {
-            assert_eq!(
-                (poly2.eval(i as f64).unwrap() - poly2_y_values[i]).abs() < 1e-6,
-                true
-            );
+            assert_almost_eq!(poly2.eval(i as f64).unwrap(), poly2_y_values[i]);
         }
-        assert_eq!((poly2.eval(-1.0).unwrap() - 18.0).abs() < 1e-6, true);
-        assert_eq!((poly2.eval(6.0).unwrap() - 4.0).abs() < 1e-6, true);
+        assert_almost_eq!(poly2.eval(-1.0).unwrap(), 18.0);
+        assert_almost_eq!(poly2.eval(6.0).unwrap(), 4.0);
     }
 
     #[test]
@@ -92,10 +86,7 @@ mod tests {
         let poly2 = newtons_divided_difference_interpolation(xs, ys);
         let poly2_y_values = vec![1.0, 1.0, 2.0, 4.0, 7.0];
         for i in 0..5 {
-            assert_eq!(
-                (poly2.eval(i as f64).unwrap() - poly2_y_values[i]).abs() < 1e-6,
-                true
-            );
+            assert_almost_eq!(poly2.eval(i as f64).unwrap(), poly2_y_values[i]);
         }
     }
 }
