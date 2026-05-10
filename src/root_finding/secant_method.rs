@@ -21,6 +21,7 @@ pub fn secant_method(f: Function, x_0: f64, x_1: f64, n_max: usize, eps_tol: f64
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::assert_almost_eq;
 
     #[test]
     fn test_secant_method_one_iteration() {
@@ -46,9 +47,11 @@ mod tests {
 
     #[test]
     fn test_secant_method_many_iteration() {
-        let epsilon = 1e-6;
         let f = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
-        assert!(secant_method(f, 1.0, 0.5, 5, 1e-6) - 0.79128784 < epsilon)
+        assert_almost_eq!(
+            secant_method(f.clone(), 1.0, 0.5, 5, 1e-6),
+            0.79128784
+        );
     }
 
     #[test]

@@ -25,6 +25,7 @@ pub fn bisection_method(function: Function, a: f64, b: f64, n_max: usize, eps_to
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::assert_almost_eq;
 
     #[test]
     fn test_bisection_method_one_iteration() {
@@ -44,16 +45,12 @@ mod tests {
 
     #[test]
     fn test_bisection_method_many_iteration() {
-        let epsilon = 1e-6;
-        assert!(bisection_method(Box::new(|x| x + 2.0), -3.0, 0.0, 20, 1e-6) + 2.0 < epsilon);
+        assert_almost_eq!(bisection_method(Box::new(|x| x + 2.0), -3.0, 0.0, 20, 1e-6), -2.0, 1e-6);
     }
 
     #[test]
     fn test_bisection_method_many_iteration_complicated() {
-        let epsilon = 1e-6;
-        assert!(
-            bisection_method(Box::new(|x| x * x - 1.7), 1.0, 2.0, 20, 1e-6) - 1.30384 < epsilon
-        );
+        assert_almost_eq!(bisection_method(Box::new(|x| x * x - 1.7), 1.0, 2.0, 20, 1e-6), 1.30384, 1e-6);
     }
 
     #[test]
