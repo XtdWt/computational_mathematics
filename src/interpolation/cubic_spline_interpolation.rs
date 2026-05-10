@@ -63,7 +63,7 @@ pub fn cubic_spline_interpolation(xs: Vec<f64>, ys: Vec<f64>) -> PiecewisePolyno
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::interpolation::polynomial::{Differentiable, Evaluatable, Integrable};
+    use crate::{assert_almost_eq, interpolation::polynomial::{Differentiable, Evaluatable, Integrable}};
 
     #[test]
     fn test_cubic_spline_interpolation_two_points() {
@@ -86,7 +86,7 @@ mod tests {
         assert_eq!(c.eval(1.0).unwrap(), 0.0);
         assert_eq!(c.eval(2.0).unwrap(), 3.0);
         assert_eq!(c.eval(0.5).unwrap(), 1.75);
-        assert_eq!((c.eval(1.8).unwrap() - 2.016).abs() < 1e-6, true);
+        assert_almost_eq!(c.eval(1.8).unwrap(), 2.016);
     }
 
     #[test]
@@ -99,8 +99,8 @@ mod tests {
         assert_eq!(c.eval(1.0).unwrap(), 1.0);
         assert_eq!(c.eval(2.0).unwrap(), 8.0);
         assert_eq!(c.eval(2.5).unwrap(), 9.0);
-        assert_eq!((c.eval(0.1).unwrap() - -0.107).abs() < 1e-6, true);
-        assert_eq!((c.eval(1.5).unwrap() - 4.60227).abs() < 1e-5, true);
+        assert_almost_eq!(c.eval(0.1).unwrap(), -0.107,  1e-5);
+        assert_almost_eq!(c.eval(1.5).unwrap(), 4.60227, 1e-5);
     }
 
     #[test]
@@ -113,8 +113,8 @@ mod tests {
         assert_eq!(c.eval(1.0).unwrap(), 1.0);
         assert_eq!(c.eval(2.0).unwrap(), 8.0);
         assert_eq!(c.eval(2.5).unwrap(), 9.0);
-        assert_eq!((c.eval(0.1).unwrap() - -0.107).abs() < 1e-6, true);
-        assert_eq!((c.eval(1.5).unwrap() - 4.60227).abs() < 1e-5, true);
+        assert_almost_eq!(c.eval(0.1).unwrap(), -0.107, 1e-5);
+        assert_almost_eq!(c.eval(1.5).unwrap(), 4.60227, 1e-5);
     }
 
     #[test]
