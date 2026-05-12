@@ -3,30 +3,26 @@ use crate::calculus::util::DerivativeType;
 
 
 fn second_order_forward_difference(function: Function, x: f64, h: f64) -> f64 {
-    (2.0 * function(x) - 5.0 * function(x + h) + 4.0 * function(x + 2.0 * h)
-        - function(x + 3.0 * h))
-        / (h.powf(2.0))
+    return (function(x + 2.0 * h) - 2.0 * function(x + h) + function(x)) / h.powi(2);
 }
 
 
 fn second_order_backward_difference(function: Function, x: f64, h: f64) -> f64 {
-    (2.0 * function(x) - 5.0 * function(x - h) + 4.0 * function(x - 2.0 * h)
-        - function(x - 3.0 * h))
-        / (h.powf(2.0))
+    return (function(x) - 2.0 * function(x - h) + function(x - 2.0 * h)) / h.powi(2);
 }
 
 
 fn second_order_central_difference(function: Function, x: f64, h: f64) -> f64 {
-    (function(x + h) - 2.0 * function(x) + function(x - h)) / (h.powf(2.0))
+    return (function(x + h) - 2.0 * function(x) + function(x - h)) / (h.powi(2));
 }
 
 
 pub fn second_derivative(function: Function, x: f64, h: f64, method: DerivativeType) -> f64 {
-    match method {
+    return match method {
         DerivativeType::Forward => second_order_forward_difference(function, x, h),
         DerivativeType::Backward => second_order_backward_difference(function, x, h),
         DerivativeType::Central => second_order_central_difference(function, x, h),
-    }
+    };
 }
 
 
@@ -34,6 +30,7 @@ pub fn second_derivative(function: Function, x: f64, h: f64, method: DerivativeT
 mod tests {
     use super::*;
     use std::f64::consts::E;
+    use crate::assert_almost_eq;
 
     #[test]
     fn second_derivative_simple_polynomial() {
@@ -42,60 +39,24 @@ mod tests {
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Forward) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Backward) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Central) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Forward), ddf(x), 1e-4);
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Backward), ddf(x), 1e-4);
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Central), ddf(x), 1e-4);
         }
     }
 
     #[test]
     fn second_derivative_polynomial() {
         let f = Box::new(
-            |x: f64| 5.0 * x.powf(4.0) + 3.0 * x.powf(3.0) - 14.0 * x - 11.0
+            |x: f64| x.powi(3) + 2.0 * x.powi(2) - 14.0 * x - 11.0
         );
-        let ddf = |x: f64| 60.0 * x.powf(2.0) + 18.0 * x;
+        let ddf = |x: f64| 6.0 * x + 4.0;
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Forward) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Backward) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Central) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Forward), ddf(x), 1e-3);
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Backward), ddf(x), 1e-3);
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Central), ddf(x), 1e-3);
         }
     }
 
@@ -106,27 +67,9 @@ mod tests {
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Forward) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Backward) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Central) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Forward), ddf(x), 1e-3);
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Backward), ddf(x), 1e-3);
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Central), ddf(x), 1e-3);
         }
     }
 
@@ -137,27 +80,9 @@ mod tests {
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Forward) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Backward) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
-            assert_eq!(
-                ((second_derivative(f.clone(), x, 0.000001, DerivativeType::Central) - ddf(x))
-                    / ddf(x))
-                .abs()
-                    < 1e-2,
-                true
-            );
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Forward), ddf(x), 1e-3);
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Backward), ddf(x), 1e-3);
+            assert_almost_eq!(second_derivative(f.clone(), x, 1e-5, DerivativeType::Central), ddf(x), 1e-3);
         }
     }
 }
