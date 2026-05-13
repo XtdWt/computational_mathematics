@@ -18,7 +18,7 @@ pub fn barycentric_lagrange_interpolation(xs: Vec<f64>, ys: Vec<f64>) -> Lagrang
             1.0 / prod
         })
         .collect();
-    LagrangePolynomial { weights, xs, ys }
+    return LagrangePolynomial { weights, xs, ys };
 }
 
 #[cfg(test)]

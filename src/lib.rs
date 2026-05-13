@@ -32,10 +32,10 @@ type Function = Box<dyn Fn(f64) -> f64>;
 
 fn wrap_py_function(py_function: Py<PyAny>) -> Function {
     // wrap python function to rust function on heap
-    Box::new(move |x| {
+    return Box::new(move |x| {
         let y: f64 = Python::attach(|py| py_function.call1(py, (x,)).unwrap().extract(py).unwrap());
         y
-    })
+    });
 }
 
 
@@ -63,7 +63,7 @@ macro_rules! assert_almost_eq {
 #[pyfunction(name = "herons_method")]
 #[pyo3(signature = (a, x_0 = 1.0, n_max=100))]
 pub fn herons_method_py(a: f64, x_0: f64, n_max: usize) -> f64 {
-    herons_method(a, x_0, n_max)
+    return herons_method(a, x_0, n_max);
 }
 
 #[pyfunction(name = "bisection_method")]
@@ -81,7 +81,7 @@ pub fn bisection_method_py(
             "`f(a)` and `f(b)` have the same sign.",
         ));
     }
-    Ok(bisection_method(f, a, b, n_max, eps_tol))
+    return Ok(bisection_method(f, a, b, n_max, eps_tol));
 }
 
 #[pyfunction(name = "newton_raphson_method")]
@@ -95,7 +95,7 @@ pub fn newton_raphson_method_py(
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(function);
     let df: Function = wrap_py_function(derivative);
-    Ok(newton_raphson_method(f, df, x_0, n_max, eps_tol))
+    return Ok(newton_raphson_method(f, df, x_0, n_max, eps_tol));
 }
 
 #[pyfunction(name = "secant_method")]
@@ -126,7 +126,7 @@ pub fn barycentric_lagrange_interpolation_py(xs: Vec<f64>, ys: Vec<f64>) -> Lagr
 #[pymethods]
 impl NewtonsDividedDifferencePolynomial {
     fn __call__(&self, x: f64) -> f64 {
-        self.eval(x).unwrap_or_else(|| f64::NAN)
+        return self.eval(x).unwrap_or_else(|| f64::NAN);
     }
 }
 
@@ -135,12 +135,12 @@ pub fn newtons_divided_difference_interpolation_py(
     xs: Vec<f64>,
     ys: Vec<f64>,
 ) -> NewtonsDividedDifferencePolynomial {
-    newtons_divided_difference_interpolation(xs, ys)
+    return newtons_divided_difference_interpolation(xs, ys);
 }
 
 #[pyfunction(name = "chebyshev_nodes")]
 pub fn chebyshev_nodes_py(a: f64, b: f64, n: usize) -> Vec<f64> {
-    chebyshev_nodes(a, b, n)
+    return chebyshev_nodes(a, b, n);
 }
 
 #[pymethods]
@@ -151,50 +151,50 @@ impl Polynomial {
 
     #[pyo3(name = "differentiate")]
     fn differentiate_py(&self) -> Self {
-        self.differentiate()
+        return self.differentiate();
     }
 
     #[pyo3(name = "integrate")]
     fn integrate_py(&self, x0: f64, y0: f64) -> Self {
-        self.integrate(x0, y0)
+        return self.integrate(x0, y0);
     }
 }
 
 #[pymethods]
 impl PiecewisePolynomial {
     fn __call__(&self, x: f64) -> f64 {
-        self.eval(x).unwrap_or_else(|| f64::NAN)
+        return self.eval(x).unwrap_or_else(|| f64::NAN);
     }
 
     #[pyo3(name = "differentiate")]
     fn differentiate_py(&self) -> Self {
-        self.differentiate()
+        return self.differentiate();
     }
 
     #[pyo3(name = "integrate")]
     fn integrate_py(&self, x0: f64, y0: f64) -> Self {
-        self.integrate(x0, y0)
+        return self.integrate(x0, y0);
     }
 }
 
 #[pyfunction(name = "cubic_spline_interpolation")]
 pub fn cubic_spline_interpolation_py(xs: Vec<f64>, ys: Vec<f64>) -> PiecewisePolynomial {
-    cubic_spline_interpolation(xs, ys)
+    return cubic_spline_interpolation(xs, ys);
 }
 
 #[pyfunction(name = "fast_fourier_transform")]
 pub fn fast_fourier_transform_py(py: Python<'_>, xs: Vec<Complex<f64>>) -> Vec<Complex<f64>> {
-    py.detach(move || fast_fourier_transform(xs))
+    return py.detach(move || fast_fourier_transform(xs));
 }
 
 #[pyfunction(name = "inverse_fast_fourier_transform")]
 pub fn inverse_fast_fourier_transform_py(xs: Vec<Complex<f64>>) -> Vec<Complex<f64>> {
-    inverse_fast_fourier_transform(xs)
+    return inverse_fast_fourier_transform(xs);
 }
 
 #[pyfunction(name = "fast_fourier_transform_frequencies")]
 pub fn fast_fourier_transform_frequencies_py(n: usize, d: f64) -> Vec<f64> {
-    fast_fourier_transform_frequencies(n, d)
+    return fast_fourier_transform_frequencies(n, d);
 }
 
 #[pyfunction(name = "first_derivative")]
@@ -212,7 +212,7 @@ pub fn first_derivative_py(function: Py<PyAny>, x: f64, h: f64, method: &str) ->
             "method: ".to_owned() + method + " must be one of ['backward', 'forward', 'central']",
         ));
     };
-    Ok(first_derivative(f, x, h, method_as_enum))
+    return Ok(first_derivative(f, x, h, method_as_enum));
 }
 
 #[pyfunction(name = "second_derivative")]
@@ -230,7 +230,7 @@ pub fn second_derivative_py(function: Py<PyAny>, x: f64, h: f64, method: &str) -
             "method: ".to_owned() + method + " must be one of ['backward', 'forward', 'central']",
         ));
     };
-    Ok(second_derivative(f, x, h, method_as_enum))
+    return Ok(second_derivative(f, x, h, method_as_enum));
 }
 
 #[pyfunction(name = "composite_trapezoid_rule")]
@@ -242,7 +242,7 @@ pub fn composite_trapezoid_rule_py(
     n_buckets: usize,
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(function);
-    Ok(composite_trapezoid_rule(f, a, b, n_buckets))
+    return Ok(composite_trapezoid_rule(f, a, b, n_buckets));
 }
 
 #[pyfunction(name = "composite_simpsons_rule")]
@@ -254,7 +254,7 @@ pub fn composite_simpsons_rule_py(
     n_buckets: usize,
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(function);
-    Ok(composite_simpsons_rule(f, a, b, n_buckets))
+    return Ok(composite_simpsons_rule(f, a, b, n_buckets));
 }
 
 #[pymodule]
@@ -280,5 +280,5 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<LagrangePolynomial>()?;
     m.add_class::<NewtonsDividedDifferencePolynomial>()?;
 
-    Ok(())
+    return Ok(());
 }
