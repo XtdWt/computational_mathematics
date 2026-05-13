@@ -32,21 +32,21 @@ fn pad_zeroes_complex(mut xs: Vec<Complex<f64>>) -> Vec<Complex<f64>> {
             xs.push(Complex::new(0.0, 0.0));
         }
     }
-    xs
+    return xs;
 }
 
 pub fn fast_fourier_transform(xs: Vec<Complex<f64>>) -> Vec<Complex<f64>> {
     let xs = pad_zeroes_complex(xs);
-    fast_fourier_transform_base(xs, false)
+    return fast_fourier_transform_base(xs, false);
 }
 
 pub fn inverse_fast_fourier_transform(xs: Vec<Complex<f64>>) -> Vec<Complex<f64>> {
     let n = xs.len() as f64;
     let xs = pad_zeroes_complex(xs);
-    fast_fourier_transform_base(xs, true)
+    return fast_fourier_transform_base(xs, true)
         .iter()
         .map(|&x| x / n)
-        .collect()
+        .collect();
 }
 
 pub fn fast_fourier_transform_frequencies(n: usize, d: f64) -> Vec<f64> {
@@ -60,7 +60,7 @@ pub fn fast_fourier_transform_frequencies(n: usize, d: f64) -> Vec<f64> {
     for i in (1..(n / 2) + 1).rev() {
         ts.push(-(i as f64) / divisor);
     }
-    ts
+    return ts;
 }
 
 #[cfg(test)]
