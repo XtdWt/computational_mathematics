@@ -13,7 +13,7 @@ Key features:
 <p>¯\_(ツ)_/¯</p>
 
 ## Setup
-Current set up for this project requires both python and rust and uses the tools `uv` and `maturin`. \
+Current set up for this project requires both python and rust and uses the tools `uv` and `maturin`.
 
 Steps:
 - Install uv: `pip install uv`
