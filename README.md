@@ -12,8 +12,8 @@ Key features:
 <p>¯\_(ツ)_/¯</p>
 
 ## Setup
-Current set up for this project is with `uv` and `maturin`
-Steps: 
+Current set up for this project is with `uv` and `maturin`.
+Steps:
 - `pip install uv`
 - `uv tool install maturin`
 - `maturin develop` or `maturin develop -r`
