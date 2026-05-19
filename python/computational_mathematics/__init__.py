@@ -1,4 +1,5 @@
 from .computational_mathematics import (
+    adaptive_integration,
     barycentric_lagrange_interpolation,
     bisection_method,
     chebyshev_nodes,
@@ -32,4 +33,5 @@ __all__ = [
     "second_derivative",
     "composite_trapezoid_rule",
     "composite_simpsons_rule",
+    "adaptive_integration",
 ]

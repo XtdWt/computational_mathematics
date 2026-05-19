@@ -3,7 +3,7 @@ use crate::calculus::util::DerivativeType;
 
 
 fn forward_difference(
-    function: Function,
+    function: &Function,
     x: f64,
     h: f64,
 ) -> f64 {
@@ -12,7 +12,7 @@ fn forward_difference(
 
 
 fn backward_difference(
-    function: Function,
+    function: &Function,
     x: f64,
     h: f64,
 ) -> f64 {
@@ -21,7 +21,7 @@ fn backward_difference(
 
 
 fn central_difference(
-    function: Function,
+    function: &Function,
     x: f64,
     h: f64,
 ) -> f64 {
@@ -36,9 +36,9 @@ pub fn first_derivative(
     method: DerivativeType,
 ) -> f64 {
     return match method {
-        DerivativeType::Forward => forward_difference(function, x, h),
-        DerivativeType::Backward => backward_difference(function, x, h),
-        DerivativeType::Central => central_difference(function, x, h),
+        DerivativeType::Forward => forward_difference(&function, x, h),
+        DerivativeType::Backward => backward_difference(&function, x, h),
+        DerivativeType::Central => central_difference(&function, x, h),
     };
 }
 

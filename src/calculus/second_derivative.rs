@@ -2,26 +2,26 @@ use crate::Function;
 use crate::calculus::util::DerivativeType;
 
 
-fn second_order_forward_difference(function: Function, x: f64, h: f64) -> f64 {
+fn second_order_forward_difference(function: &Function, x: f64, h: f64) -> f64 {
     return (function(x + 2.0 * h) - 2.0 * function(x + h) + function(x)) / h.powi(2);
 }
 
 
-fn second_order_backward_difference(function: Function, x: f64, h: f64) -> f64 {
+fn second_order_backward_difference(function: &Function, x: f64, h: f64) -> f64 {
     return (function(x) - 2.0 * function(x - h) + function(x - 2.0 * h)) / h.powi(2);
 }
 
 
-fn second_order_central_difference(function: Function, x: f64, h: f64) -> f64 {
+fn second_order_central_difference(function: &Function, x: f64, h: f64) -> f64 {
     return (function(x + h) - 2.0 * function(x) + function(x - h)) / (h.powi(2));
 }
 
 
 pub fn second_derivative(function: Function, x: f64, h: f64, method: DerivativeType) -> f64 {
     return match method {
-        DerivativeType::Forward => second_order_forward_difference(function, x, h),
-        DerivativeType::Backward => second_order_backward_difference(function, x, h),
-        DerivativeType::Central => second_order_central_difference(function, x, h),
+        DerivativeType::Forward => second_order_forward_difference(&function, x, h),
+        DerivativeType::Backward => second_order_backward_difference(&function, x, h),
+        DerivativeType::Central => second_order_central_difference(&function, x, h),
     };
 }
 

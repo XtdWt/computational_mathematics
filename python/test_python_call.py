@@ -1,5 +1,6 @@
 import pytest
 from computational_mathematics import (
+    adaptive_integration,
     barycentric_lagrange_interpolation,
     bisection_method,
     chebyshev_nodes,
@@ -37,3 +38,5 @@ if __name__ == "__main__":
 
     ddf = second_derivative(f, 1, 0.001)
     print(ddf)
+
+    print(adaptive_integration)
