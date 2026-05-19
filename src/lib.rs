@@ -82,7 +82,7 @@ pub fn bisection_method_py(
             "`f(a)` and `f(b)` have the same sign.",
         ));
     }
-    return Ok(bisection_method(f, a, b, n_max, eps_tol));
+    return Ok(bisection_method(&f, a, b, n_max, eps_tol));
 }
 
 #[pyfunction(name = "newton_raphson_method")]
@@ -96,7 +96,7 @@ pub fn newton_raphson_method_py(
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(function);
     let df: Function = wrap_py_function(derivative);
-    return Ok(newton_raphson_method(f, df, x_0, n_max, eps_tol));
+    return Ok(newton_raphson_method(&f, &df, x_0, n_max, eps_tol));
 }
 
 #[pyfunction(name = "secant_method")]
@@ -109,7 +109,7 @@ pub fn secant_method_py(
     eps_tol: f64,
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(function);
-    return Ok(secant_method(f, x_0, x_1, n_max, eps_tol));
+    return Ok(secant_method(&f, x_0, x_1, n_max, eps_tol));
 }
 
 #[pymethods]
@@ -213,7 +213,7 @@ pub fn first_derivative_py(function: Py<PyAny>, x: f64, h: f64, method: &str) ->
             "method: ".to_owned() + method + " must be one of ['backward', 'forward', 'central']",
         ));
     };
-    return Ok(first_derivative(f, x, h, method_as_enum));
+    return Ok(first_derivative(&f, x, h, method_as_enum));
 }
 
 #[pyfunction(name = "second_derivative")]
@@ -231,7 +231,7 @@ pub fn second_derivative_py(function: Py<PyAny>, x: f64, h: f64, method: &str) -
             "method: ".to_owned() + method + " must be one of ['backward', 'forward', 'central']",
         ));
     };
-    return Ok(second_derivative(f, x, h, method_as_enum));
+    return Ok(second_derivative(&f, x, h, method_as_enum));
 }
 
 #[pyfunction(name = "composite_trapezoid_rule")]

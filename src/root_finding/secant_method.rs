@@ -1,6 +1,6 @@
 use crate::Function;
 
-pub fn secant_method(f: Function, x_0: f64, x_1: f64, n_max: usize, eps_tol: f64) -> f64 {
+pub fn secant_method(f: &Function, x_0: f64, x_1: f64, n_max: usize, eps_tol: f64) -> f64 {
     let mut x0 = x_0;
     let mut x1 = x_1;
 
@@ -25,9 +25,9 @@ mod tests {
 
     #[test]
     fn test_secant_method_one_iteration() {
-        let f = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
+        let f: Function = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
         assert_eq!(
-            secant_method(f, 1.0, 0.9, 1, 1e-6),
+            secant_method(&f, 1.0, 0.9, 1, 1e-6),
             0.9 - 0.51 * (0.1 / 0.49)
         )
     }
@@ -35,31 +35,31 @@ mod tests {
     #[test]
     fn test_secant_method_two_iteration() {
         let x_2 = 0.9 - 0.51 * (0.1 / 0.49);
-        let f = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
+        let f: Function = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
         let f_x_2 = f(x_2);
         let f_x_1 = f(0.9);
 
         assert_eq!(
-            secant_method(f, 1.0, 0.9, 2, 1e-6),
+            secant_method(&f, 1.0, 0.9, 2, 1e-6),
             x_2 - f_x_2 * ((x_2 - 0.9) / (f_x_2 - f_x_1))
         )
     }
 
     #[test]
     fn test_secant_method_many_iteration() {
-        let f = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
+        let f: Function = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
         assert_almost_eq!(
-            secant_method(f.clone(), 1.0, 0.5, 5, 1e-6),
+            secant_method(&f, 1.0, 0.5, 5, 1e-6),
             0.79128784
         );
     }
 
     #[test]
     fn test_secant_method_tolerance_break() {
-        let f = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
+        let f: Function = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
         assert_eq!(
-            secant_method(f.clone(), 1.0, 0.5, 5, 1.0),
-            secant_method(f, 1.0, 0.5, 1, 1e-6)
+            secant_method(&f, 1.0, 0.5, 5, 1.0),
+            secant_method(&f, 1.0, 0.5, 1, 1e-6)
         )
     }
 }

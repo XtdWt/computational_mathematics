@@ -1,8 +1,8 @@
 use crate::Function;
 
 pub fn newton_raphson_method(
-    function: Function,
-    derivative: Function,
+    function: &Function,
+    derivative: &Function,
     x_0: f64,
     n_max: usize,
     eps_tol: f64,
@@ -27,42 +27,42 @@ use super::*;
 
     #[test]
     fn test_newton_raphson_method_one_iteration() {
-        let f = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
-        let df = Box::new(|x: f64| 2.0 * x + 3.0);
+        let f: Function = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
+        let df: Function = Box::new(|x: f64| 2.0 * x + 3.0);
         assert_eq!(
-            newton_raphson_method(f, df, 1.0, 1, 1e-6),
+            newton_raphson_method(&f, &df, 1.0, 1, 1e-6),
             1.0 - (1.0 / 5.0)
         )
     }
 
     #[test]
     fn test_newton_raphson_method_two_iteration() {
-        let f = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
-        let df = Box::new(|x: f64| 2.0 * x + 3.0);
-        assert_almost_eq!(newton_raphson_method(f.clone(), df.clone(), 1.0, 2, 1e-6), 0.8 - (0.04 / 4.6));
+        let f: Function = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
+        let df: Function = Box::new(|x: f64| 2.0 * x + 3.0);
+        assert_almost_eq!(newton_raphson_method(&f, &df, 1.0, 2, 1e-6), 0.8 - (0.04 / 4.6));
     }
 
     #[test]
     fn test_newton_raphson_method_many_iteration() {
-        let f = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
-        let df = Box::new(|x: f64| 2.0 * x + 3.0);
-        assert_almost_eq!(newton_raphson_method(f.clone(), df.clone(), 1.0, 20, 1e-6), 0.79128784);
+        let f: Function = Box::new(|x: f64| x * x + 3.0 * x - 3.0);
+        let df: Function = Box::new(|x: f64| 2.0 * x + 3.0);
+        assert_almost_eq!(newton_raphson_method(&f, &df, 1.0, 20, 1e-6), 0.79128784);
     }
 
     #[test]
     fn test_newton_raphson_method_simple() {
-        let f = Box::new(|x: f64| x + 3.0);
-        let df = Box::new(|_x: f64| 1.0);
-        assert_almost_eq!(newton_raphson_method(f.clone(), df.clone(), 1.0, 20, 1e-6), -3.0);
+        let f: Function = Box::new(|x: f64| x + 3.0);
+        let df: Function = Box::new(|_x: f64| 1.0);
+        assert_almost_eq!(newton_raphson_method(&f, &df, 1.0, 20, 1e-6), -3.0);
     }
 
     #[test]
     fn test_newton_raphson_method_tolerance_break() {
-        let f = Box::new(|x: f64| x + 3.0);
-        let df = Box::new(|_x: f64| 1.0);
+        let f: Function = Box::new(|x: f64| x + 3.0);
+        let df: Function = Box::new(|_x: f64| 1.0);
         assert_eq!(
-            newton_raphson_method(f.clone(), df.clone(), 1.0, 20, 1.0),
-            newton_raphson_method(f, df, 1.0, 1, 1e-6)
+            newton_raphson_method(&f, &df, 1.0, 20, 1.0),
+            newton_raphson_method(&f, &df, 1.0, 1, 1e-6)
         )
     }
 }
