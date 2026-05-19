@@ -24,7 +24,7 @@ use crate::interpolation::polynomial::{
 
 mod calculus;
 use crate::calculus::first_derivative::first_derivative;
-use crate::calculus::integration::{composite_simpsons_rule, composite_trapezoid_rule};
+use crate::calculus::composite_integration::{composite_simpsons_rule, composite_trapezoid_rule};
 use crate::calculus::second_derivative::second_derivative;
 use crate::calculus::util::DerivativeType;
 
