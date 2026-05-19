@@ -2,7 +2,7 @@ use crate::Function;
 use crate::calculus::composite_integration::composite_trapezoid_rule;
 
 
-pub fn adaptive_integration(
+pub fn adaptive_quadrature(
     f: &Function,
     a: f64,
     b: f64,
@@ -43,7 +43,7 @@ mod tests {
 
         let expected_result = big_f(b) - big_f(a);
 
-        assert_almost_eq!(adaptive_integration(&f, a, b, 1e-7), expected_result, 1e-5);
+        assert_almost_eq!(adaptive_quadrature(&f, a, b, 1e-7), expected_result, 1e-5);
     }
 
     #[test]
@@ -55,7 +55,7 @@ mod tests {
 
         let expected_result = big_f(b) - big_f(a);
 
-        assert_almost_eq!(adaptive_integration(&f, a, b, 1e-7), expected_result, 1e-4);
+        assert_almost_eq!(adaptive_quadrature(&f, a, b, 1e-7), expected_result, 1e-4);
     }
 
     #[test]
@@ -67,7 +67,7 @@ mod tests {
 
         let expected_result = big_f(b) - big_f(a);
 
-        assert_almost_eq!(adaptive_integration(&f, a, b, 1e-7), expected_result, 1e-5);
+        assert_almost_eq!(adaptive_quadrature(&f, a, b, 1e-7), expected_result, 1e-5);
     }
 
     #[test]
@@ -79,6 +79,6 @@ mod tests {
 
         let expected_result = big_f(b) - big_f(a);
 
-        assert_almost_eq!(adaptive_integration(&f, a, b, 1e-7), expected_result, 1e-5);
+        assert_almost_eq!(adaptive_quadrature(&f, a, b, 1e-7), expected_result, 1e-5);
     }
 }
