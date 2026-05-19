@@ -26,6 +26,7 @@ mod calculus;
 use crate::calculus::first_derivative::first_derivative;
 use crate::calculus::composite_integration::{composite_simpsons_rule, composite_trapezoid_rule};
 use crate::calculus::second_derivative::second_derivative;
+use crate::calculus::adaptive_integration::adaptive_integration;
 use crate::calculus::util::DerivativeType;
 
 type Function = Box<dyn Fn(f64) -> f64>;
@@ -242,7 +243,7 @@ pub fn composite_trapezoid_rule_py(
     n_buckets: usize,
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(function);
-    return Ok(composite_trapezoid_rule(f, a, b, n_buckets));
+    return Ok(composite_trapezoid_rule(&f, a, b, n_buckets));
 }
 
 #[pyfunction(name = "composite_simpsons_rule")]
@@ -254,7 +255,19 @@ pub fn composite_simpsons_rule_py(
     n_buckets: usize,
 ) -> PyResult<f64> {
     let f: Function = wrap_py_function(function);
-    return Ok(composite_simpsons_rule(f, a, b, n_buckets));
+    return Ok(composite_simpsons_rule(&f, a, b, n_buckets));
+}
+
+#[pyfunction(name = "adaptive_integration")]
+#[pyo3(signature = (function, a, b, eps_tol=1e-7))]
+pub fn adaptive_integration_py(
+    function: Py<PyAny>,
+    a: f64,
+    b: f64,
+    eps_tol: f64,
+) -> PyResult<f64> {
+    let f: Function = wrap_py_function(function);
+    return Ok(adaptive_integration(&f, a, b, eps_tol));
 }
 
 #[pymodule]
@@ -274,6 +287,7 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(second_derivative_py, m)?)?;
     m.add_function(wrap_pyfunction!(composite_trapezoid_rule_py, m)?)?;
     m.add_function(wrap_pyfunction!(composite_simpsons_rule_py, m)?)?;
+    m.add_function(wrap_pyfunction!(adaptive_integration_py, m)?)?;
 
     m.add_class::<PiecewisePolynomial>()?;
     m.add_class::<Polynomial>()?;
