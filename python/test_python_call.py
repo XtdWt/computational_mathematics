@@ -7,6 +7,7 @@ from computational_mathematics import (
     cubic_spline_interpolation,
     fast_fourier_transform,
     herons_method,
+    romberg_integration,
     second_derivative,
 )
 
@@ -40,3 +41,5 @@ if __name__ == "__main__":
     print(ddf)
 
     print(adaptive_quadrature)
+
+    print(romberg_integration(lambda x: x**2 + 7, -1, 4, 2))

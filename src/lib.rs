@@ -27,6 +27,7 @@ use crate::calculus::first_derivative::first_derivative;
 use crate::calculus::composite_integration::{composite_simpsons_rule, composite_trapezoid_rule};
 use crate::calculus::second_derivative::second_derivative;
 use crate::calculus::adaptive_quadrature::adaptive_quadrature;
+use crate::calculus::romberg_integration::romberg_integration;
 use crate::calculus::util::DerivativeType;
 
 type Function = Box<dyn Fn(f64) -> f64>;
@@ -270,6 +271,20 @@ pub fn adaptive_quadrature_py(
     return Ok(adaptive_quadrature(&f, a, b, eps_tol));
 }
 
+
+#[pyfunction(name = "romberg_integration")]
+#[pyo3(signature = (function, a, b, k))]
+pub fn romberg_integration_py(
+    function: Py<PyAny>,
+    a: f64,
+    b: f64,
+    k: usize,
+) -> PyResult<f64> {
+    let f: Function = wrap_py_function(function);
+    return Ok(romberg_integration(&f, a, b, k));
+}
+
+
 #[pymodule]
 fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(herons_method_py, m)?)?;
@@ -288,6 +303,7 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(composite_trapezoid_rule_py, m)?)?;
     m.add_function(wrap_pyfunction!(composite_simpsons_rule_py, m)?)?;
     m.add_function(wrap_pyfunction!(adaptive_quadrature_py, m)?)?;
+    m.add_function(wrap_pyfunction!(romberg_integration_py, m)?)?;
 
     m.add_class::<PiecewisePolynomial>()?;
     m.add_class::<Polynomial>()?;

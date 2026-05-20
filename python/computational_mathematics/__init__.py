@@ -13,6 +13,7 @@ from .computational_mathematics import (
     inverse_fast_fourier_transform,
     newton_raphson_method,
     newtons_divided_difference_interpolation,
+    romberg_integration,
     secant_method,
     second_derivative,
 )
@@ -34,4 +35,5 @@ __all__ = [
     "composite_trapezoid_rule",
     "composite_simpsons_rule",
     "adaptive_quadrature",
+    "romberg_integration",
 ]
