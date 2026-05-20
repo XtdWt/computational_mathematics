@@ -44,8 +44,8 @@ pub fn composite_simpsons_rule (
             let x1 = a + (2.0 * i_64 - 1.0) * step;
             let x2 = a + (2.0 * i_64 - 2.0) * step;
 
-            vec![x0, x1, x2]
-        }).collect::<Vec<Vec<f64>>>()
+            [x0, x1, x2]
+        }).collect::<Vec<[f64; 3]>>()
         .into_iter()
         .map(|i_list| {(step / 3.0) * (f(i_list[0]) + 4.0 * f(i_list[1]) + f(i_list[2]))})
         .sum();
