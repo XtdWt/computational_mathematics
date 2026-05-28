@@ -28,9 +28,11 @@ use crate::calculus::composite_integration::{composite_simpsons_rule, composite_
 use crate::calculus::second_derivative::second_derivative;
 use crate::calculus::adaptive_quadrature::adaptive_quadrature;
 use crate::calculus::romberg_integration::romberg_integration;
-use crate::calculus::util::DerivativeType;
+use crate::calculus::simple_ivp_solver::simple_ivp_solver;
+use crate::calculus::util::{DerivativeType, SimpleIVPSolverType};
 
 type Function = Box<dyn Fn(f64) -> f64>;
+type MultivariateFunction = Box<dyn Fn(Vec<f64>) -> Vec<f64>>;
 
 fn wrap_py_function(py_function: Py<PyAny>) -> Function {
     // wrap python function to rust function on heap
@@ -40,6 +42,12 @@ fn wrap_py_function(py_function: Py<PyAny>) -> Function {
     });
 }
 
+fn wrap_py_multivariatefunction(py_function: Py<PyAny>) -> MultivariateFunction {
+    return Box::new(move |x| {
+        let y: Vec<f64> = Python::attach(|py| py_function.call1(py, (x,)).unwrap().extract(py).unwrap());
+        y
+    });
+}
 
 #[macro_export]
 macro_rules! assert_almost_eq {
@@ -87,29 +95,29 @@ pub fn bisection_method_py(
 }
 
 #[pyfunction(name = "newton_raphson_method")]
-#[pyo3(signature = (function, derivative, x_0, n_max=100, eps_tol=0.000001))]
+#[pyo3(signature = (f, df, x_0, n_max=100, eps_tol=0.000001))]
 pub fn newton_raphson_method_py(
-    function: Py<PyAny>,
-    derivative: Py<PyAny>,
+    f: Py<PyAny>,
+    df: Py<PyAny>,
     x_0: f64,
     n_max: usize,
     eps_tol: f64,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(function);
-    let df: Function = wrap_py_function(derivative);
+    let f: Function = wrap_py_function(f);
+    let df: Function = wrap_py_function(df);
     return Ok(newton_raphson_method(&f, &df, x_0, n_max, eps_tol));
 }
 
 #[pyfunction(name = "secant_method")]
-#[pyo3(signature = (function, x_0, x_1, n_max=100, eps_tol=0.000001))]
+#[pyo3(signature = (f, x_0, x_1, n_max=100, eps_tol=0.000001))]
 pub fn secant_method_py(
-    function: Py<PyAny>,
+    f: Py<PyAny>,
     x_0: f64,
     x_1: f64,
     n_max: usize,
     eps_tol: f64,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(function);
+    let f: Function = wrap_py_function(f);
     return Ok(secant_method(&f, x_0, x_1, n_max, eps_tol));
 }
 
@@ -200,9 +208,9 @@ pub fn fast_fourier_transform_frequencies_py(n: usize, d: f64) -> Vec<f64> {
 }
 
 #[pyfunction(name = "first_derivative")]
-#[pyo3(signature = (function, x, h, method="central"))]
-pub fn first_derivative_py(function: Py<PyAny>, x: f64, h: f64, method: &str) -> PyResult<f64> {
-    let f: Function = wrap_py_function(function);
+#[pyo3(signature = (f, x, h, method="central"))]
+pub fn first_derivative_py(f: Py<PyAny>, x: f64, h: f64, method: &str) -> PyResult<f64> {
+    let f: Function = wrap_py_function(f);
     let method_as_enum = if method == "backward" {
         DerivativeType::Backward
     } else if method == "forward" {
@@ -218,9 +226,9 @@ pub fn first_derivative_py(function: Py<PyAny>, x: f64, h: f64, method: &str) ->
 }
 
 #[pyfunction(name = "second_derivative")]
-#[pyo3(signature = (function, x, h, method="central"))]
-pub fn second_derivative_py(function: Py<PyAny>, x: f64, h: f64, method: &str) -> PyResult<f64> {
-    let f: Function = wrap_py_function(function);
+#[pyo3(signature = (f, x, h, method="central"))]
+pub fn second_derivative_py(f: Py<PyAny>, x: f64, h: f64, method: &str) -> PyResult<f64> {
+    let f: Function = wrap_py_function(f);
     let method_as_enum = if method == "backward" {
         DerivativeType::Backward
     } else if method == "forward" {
@@ -236,54 +244,79 @@ pub fn second_derivative_py(function: Py<PyAny>, x: f64, h: f64, method: &str) -
 }
 
 #[pyfunction(name = "composite_trapezoid_rule")]
-#[pyo3(signature = (function, a, b, n_buckets=100))]
+#[pyo3(signature = (f, a, b, n_buckets=100))]
 pub fn composite_trapezoid_rule_py(
-    function: Py<PyAny>,
+    f: Py<PyAny>,
     a: f64,
     b: f64,
     n_buckets: usize,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(function);
+    let f: Function = wrap_py_function(f);
     return Ok(composite_trapezoid_rule(&f, a, b, n_buckets));
 }
 
 #[pyfunction(name = "composite_simpsons_rule")]
-#[pyo3(signature = (function, a, b, n_buckets=100))]
+#[pyo3(signature = (f, a, b, n_buckets=100))]
 pub fn composite_simpsons_rule_py(
-    function: Py<PyAny>,
+    f: Py<PyAny>,
     a: f64,
     b: f64,
     n_buckets: usize,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(function);
+    let f: Function = wrap_py_function(f);
     return Ok(composite_simpsons_rule(&f, a, b, n_buckets));
 }
 
 #[pyfunction(name = "adaptive_quadrature")]
-#[pyo3(signature = (function, a, b, eps_tol=1e-7))]
+#[pyo3(signature = (f, a, b, eps_tol=1e-7))]
 pub fn adaptive_quadrature_py(
-    function: Py<PyAny>,
+    f: Py<PyAny>,
     a: f64,
     b: f64,
     eps_tol: f64,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(function);
+    let f: Function = wrap_py_function(f);
     return Ok(adaptive_quadrature(&f, a, b, eps_tol));
 }
 
 
 #[pyfunction(name = "romberg_integration")]
-#[pyo3(signature = (function, a, b, k))]
+#[pyo3(signature = (f, a, b, k))]
 pub fn romberg_integration_py(
-    function: Py<PyAny>,
+    f: Py<PyAny>,
     a: f64,
     b: f64,
     k: usize,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(function);
+    let f: Function = wrap_py_function(f);
     return Ok(romberg_integration(&f, a, b, k));
 }
 
+
+#[pyfunction(name = "simple_ivp_solver")]
+#[pyo3(signature = (df, y0, t0, tn, h, method="midpoint"))]
+pub fn simple_ivp_solver_py(
+    df: Py<PyAny>,
+    y0: f64,
+    t0: f64,
+    tn: f64,
+    h: f64,
+    method: &str,
+) -> PyResult<(Vec<f64>, Vec<f64>)> {
+    let df: MultivariateFunction = wrap_py_multivariatefunction(df);
+    let method_as_enum = if method == "euler" {
+        SimpleIVPSolverType::Eulers
+    } else if method == "trapeziod" {
+        SimpleIVPSolverType::Trapeziod
+    } else if method == "midpoint" {
+        SimpleIVPSolverType::Midpoint
+    } else {
+        return Err(PyValueError::new_err(
+            "method: ".to_owned() + method + " must be one of ['backward', 'forward', 'central']",
+        ));
+    };
+    return Ok(simple_ivp_solver(&df, y0, t0, tn, h, method_as_enum));
+}
 
 #[pymodule]
 fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
@@ -304,6 +337,7 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(composite_simpsons_rule_py, m)?)?;
     m.add_function(wrap_pyfunction!(adaptive_quadrature_py, m)?)?;
     m.add_function(wrap_pyfunction!(romberg_integration_py, m)?)?;
+    m.add_function(wrap_pyfunction!(simple_ivp_solver_py, m)?)?;
 
     m.add_class::<PiecewisePolynomial>()?;
     m.add_class::<Polynomial>()?;

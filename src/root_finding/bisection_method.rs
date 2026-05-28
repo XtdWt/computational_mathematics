@@ -1,13 +1,13 @@
 use crate::Function;
 
-pub fn bisection_method(function: &Function, a: f64, b: f64, n_max: usize, eps_tol: f64) -> f64 {
+pub fn bisection_method(f: &Function, a: f64, b: f64, n_max: usize, eps_tol: f64) -> f64 {
     let mut lower = a;
     let mut upper = b;
-    let mut f_low = function(lower);
+    let mut f_low = f(lower);
     let mut c = (lower + upper) / 2.0;
     for _ in 0..n_max {
         c = (lower + upper) / 2.0;
-        let f_c = function(c);
+        let f_c = f(c);
 
         if f_c.abs() < eps_tol {
             return c;

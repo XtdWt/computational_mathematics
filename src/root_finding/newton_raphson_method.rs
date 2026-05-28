@@ -1,8 +1,8 @@
 use crate::Function;
 
 pub fn newton_raphson_method(
-    function: &Function,
-    derivative: &Function,
+    f: &Function,
+    df: &Function,
     x_0: f64,
     n_max: usize,
     eps_tol: f64,
@@ -10,7 +10,7 @@ pub fn newton_raphson_method(
     let mut x = x_0;
 
     for _ in 0..n_max {
-        let x_next = x - function(x) / derivative(x);
+        let x_next = x - f(x) / df(x);
         if (x_next - x).abs() < eps_tol {
             return x_next;
         }
