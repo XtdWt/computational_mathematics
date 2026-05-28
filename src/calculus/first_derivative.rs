@@ -3,42 +3,42 @@ use crate::calculus::util::DerivativeType;
 
 
 fn forward_difference(
-    function: &Function,
+    f: &Function,
     x: f64,
     h: f64,
 ) -> f64 {
-    return (function(x+h) - function(x)) / h;
+    return (f(x+h) - f(x)) / h;
 }
 
 
 fn backward_difference(
-    function: &Function,
+    f: &Function,
     x: f64,
     h: f64,
 ) -> f64 {
-    return (function(x) - function(x-h)) / h;
+    return (f(x) - f(x-h)) / h;
 }
 
 
 fn central_difference(
-    function: &Function,
+    f: &Function,
     x: f64,
     h: f64,
 ) -> f64 {
-    return (function(x + h) - function(x - h)) / (2.0 * h);
+    return (f(x + h) - f(x - h)) / (2.0 * h);
 }
 
 
 pub fn first_derivative(
-    function: &Function,
+    f: &Function,
     x: f64,
     h: f64,
     method: DerivativeType,
 ) -> f64 {
     return match method {
-        DerivativeType::Forward => forward_difference(function, x, h),
-        DerivativeType::Backward => backward_difference(function, x, h),
-        DerivativeType::Central => central_difference(function, x, h),
+        DerivativeType::Forward => forward_difference(f, x, h),
+        DerivativeType::Backward => backward_difference(f, x, h),
+        DerivativeType::Central => central_difference(f, x, h),
     };
 }
 
