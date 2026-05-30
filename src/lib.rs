@@ -1,4 +1,5 @@
 use num_complex::Complex;
+use nalgebra::DVector;
 
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
@@ -31,15 +32,27 @@ use crate::calculus::romberg_integration::romberg_integration;
 use crate::calculus::simple_ivp_solver::simple_ivp_solver;
 use crate::calculus::util::{DerivativeType, SimpleIVPSolverType};
 
-type Function = Box<dyn Fn(f64) -> f64>;
 type MultivariateFunction = Box<dyn Fn(Vec<f64>) -> Vec<f64>>;
 
-fn wrap_py_function(py_function: Py<PyAny>) -> Function {
-    // wrap python function to rust function on heap
-    return Box::new(move |x| {
-        let y: f64 = Python::attach(|py| py_function.call1(py, (x,)).unwrap().extract(py).unwrap());
-        y
-    });
+// fn wrap_py_function(py_function: Py<PyAny>) -> Function {
+//     // wrap python function to rust function on heap
+//     return Box::new(move |x| {
+//         let y: f64 = Python::attach(|py| py_function.call1(py, (x,)).unwrap().extract(py).unwrap());
+//         y
+//     });
+// }
+//
+// type Function = Fn(f64) -> f64;
+
+pub fn wrap_py_function(py_function: Py<PyAny>) -> impl Fn(f64) -> f64 + Send + 'static {
+    move |x: f64| {
+        Python::attach(|py| {
+            py_function
+                .call1(py, (x,))
+                .and_then(|result| result.extract::<f64>(py))
+                .unwrap_or_else(|e| panic!("Python function call failed: {e}"))
+        })
+    }
 }
 
 fn wrap_py_multivariatefunction(py_function: Py<PyAny>) -> MultivariateFunction {
@@ -85,7 +98,7 @@ pub fn bisection_method_py(
     n_max: usize,
     eps_tol: f64,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(f);
+    let f = wrap_py_function(f);
     if f(a) * f(b) > 0.0 {
         return Err(PyValueError::new_err(
             "`f(a)` and `f(b)` have the same sign.",
@@ -103,8 +116,8 @@ pub fn newton_raphson_method_py(
     n_max: usize,
     eps_tol: f64,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(f);
-    let df: Function = wrap_py_function(df);
+    let f = wrap_py_function(f);
+    let df = wrap_py_function(df);
     return Ok(newton_raphson_method(&f, &df, x_0, n_max, eps_tol));
 }
 
@@ -117,7 +130,7 @@ pub fn secant_method_py(
     n_max: usize,
     eps_tol: f64,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(f);
+    let f = wrap_py_function(f);
     return Ok(secant_method(&f, x_0, x_1, n_max, eps_tol));
 }
 
@@ -210,7 +223,7 @@ pub fn fast_fourier_transform_frequencies_py(n: usize, d: f64) -> Vec<f64> {
 #[pyfunction(name = "first_derivative")]
 #[pyo3(signature = (f, x, h, method="central"))]
 pub fn first_derivative_py(f: Py<PyAny>, x: f64, h: f64, method: &str) -> PyResult<f64> {
-    let f: Function = wrap_py_function(f);
+    let f = wrap_py_function(f);
     let method_as_enum = if method == "backward" {
         DerivativeType::Backward
     } else if method == "forward" {
@@ -228,7 +241,7 @@ pub fn first_derivative_py(f: Py<PyAny>, x: f64, h: f64, method: &str) -> PyResu
 #[pyfunction(name = "second_derivative")]
 #[pyo3(signature = (f, x, h, method="central"))]
 pub fn second_derivative_py(f: Py<PyAny>, x: f64, h: f64, method: &str) -> PyResult<f64> {
-    let f: Function = wrap_py_function(f);
+    let f = wrap_py_function(f);
     let method_as_enum = if method == "backward" {
         DerivativeType::Backward
     } else if method == "forward" {
@@ -251,7 +264,7 @@ pub fn composite_trapezoid_rule_py(
     b: f64,
     n_buckets: usize,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(f);
+    let f = wrap_py_function(f);
     return Ok(composite_trapezoid_rule(&f, a, b, n_buckets));
 }
 
@@ -263,7 +276,7 @@ pub fn composite_simpsons_rule_py(
     b: f64,
     n_buckets: usize,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(f);
+    let f = wrap_py_function(f);
     return Ok(composite_simpsons_rule(&f, a, b, n_buckets));
 }
 
@@ -275,7 +288,7 @@ pub fn adaptive_quadrature_py(
     b: f64,
     eps_tol: f64,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(f);
+    let f = wrap_py_function(f);
     return Ok(adaptive_quadrature(&f, a, b, eps_tol));
 }
 
@@ -288,7 +301,7 @@ pub fn romberg_integration_py(
     b: f64,
     k: usize,
 ) -> PyResult<f64> {
-    let f: Function = wrap_py_function(f);
+    let f = wrap_py_function(f);
     return Ok(romberg_integration(&f, a, b, k));
 }
 
