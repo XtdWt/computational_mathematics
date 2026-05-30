@@ -1,8 +1,7 @@
-use crate::Function;
 use nalgebra::DMatrix;
 
-pub fn romberg_integration(
-    f: &Function,
+pub fn romberg_integration<F: Fn(f64) -> f64>(
+    f: &F,
     a: f64,
     b: f64,
     k: usize,
@@ -37,7 +36,7 @@ mod tests {
 
     #[test]
     fn test_simple_polynomial_k_two() {
-        let f: Function = Box::new(|x| x.powi(2) + 7.0);
+        let f = |x: f64| x.powi(2) + 7.0;
         let r = romberg_integration(&f, -1.0, 4.0, 2);
 
         assert_almost_eq!(r, 55.0/3.0);
@@ -46,7 +45,7 @@ mod tests {
     #[test]
     fn test_simple_polynomial_k_large() {
         let k = 25;
-        let f: Function = Box::new(|x| x.powi(2) + 7.0);
+        let f = |x: f64| x.powi(2) + 7.0;
         let r = romberg_integration(&f, -1.0, 4.0, k);
 
         assert_almost_eq!(r, 170.0 / 3.0, 1e-4);

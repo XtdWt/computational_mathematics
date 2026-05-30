@@ -1,9 +1,7 @@
 use rayon::prelude::*;
 
-use crate::Function;
-
-pub fn composite_trapezoid_rule (
-    f: &Function,
+pub fn composite_trapezoid_rule<F: Fn(f64) -> f64>(
+    f: &F,
     a: f64,
     b: f64,
     n_buckets: usize,
@@ -19,8 +17,8 @@ pub fn composite_trapezoid_rule (
 }
 
 
-pub fn composite_simpsons_rule (
-    f: &Function,
+pub fn composite_simpsons_rule<F: Fn(f64) -> f64>(
+    f: &F,
     a: f64,
     b: f64,
     n_buckets: usize,
@@ -60,7 +58,7 @@ mod tests {
 
     #[test]
     fn integrate_simple_polynomial_n_one() {
-        let f: Function = Box::new(|x: f64| 2.0*x + 3.0);
+        let f = |x: f64| 2.0*x + 3.0;
         let a = 1.0;
         let b = 4.0;
 
@@ -70,7 +68,7 @@ mod tests {
 
     #[test]
     fn integrate_simple_polynomial() {
-        let f: Function = Box::new(|x: f64| 2.0*x + 3.0);
+        let f = |x: f64| 2.0*x + 3.0;
         let big_f = |x: f64| x*x + 3.0*x;
         let a = 1.0;
         let b = 4.0;
@@ -95,7 +93,7 @@ mod tests {
 
     #[test]
     fn integrate_polynomial_n_one() {
-        let f: Function = Box::new(|x: f64| 5.0*x.powf(4.0) + 3.0*x.powf(2.0) - 14.0*x - 11.0);
+        let f = |x: f64| 5.0*x.powf(4.0) + 3.0*x.powf(2.0) - 14.0*x - 11.0;
         let a = 1.0;
         let b = 4.0;
 
@@ -105,7 +103,7 @@ mod tests {
 
     #[test]
     fn integrate_polynomial() {
-        let f: Function = Box::new(|x: f64| 5.0*x.powf(4.0) + 3.0*x.powf(2.0) - 14.0*x - 11.0);
+        let f = |x: f64| 5.0*x.powf(4.0) + 3.0*x.powf(2.0) - 14.0*x - 11.0;
         let big_f = |x: f64| x.powf(5.0) + x.powf(3.0) - 7.0*x.powf(2.0) - 11.0*x;
         let a = 1.0;
         let b = 4.0;
@@ -131,7 +129,7 @@ mod tests {
 
     #[test]
     fn integrate_sine_n_one() {
-        let f: Function = Box::new(|x: f64| (2.0*x).sin());
+        let f = |x: f64| (2.0*x).sin();
         let a = 1.0;
         let b = 4.0;
 
@@ -148,7 +146,7 @@ mod tests {
 
     #[test]
     fn integrate_sine() {
-        let f: Function = Box::new(|x: f64| (2.0*x).sin());
+        let f = |x: f64| (2.0*x).sin();
         let big_f = |x: f64| -0.5*(2.0*x).cos();
         let a = 1.0;
         let b = 4.0;
@@ -173,7 +171,7 @@ mod tests {
 
     #[test]
     fn integrate_exponential_n_one() {
-        let f: Function = Box::new(|x: f64| E.powf(-x));
+        let f = |x: f64| E.powf(-x);
         let a = 1.0;
         let b = 4.0;
 
@@ -191,7 +189,7 @@ mod tests {
 
     #[test]
     fn integrate_exponential() {
-        let f: Function = Box::new(|x: f64| E.powf(-x));
+        let f = |x: f64| E.powf(-x);
         let big_f = |x: f64| -1.0*E.powf(-x);
         let a = 1.0;
         let b = 4.0;

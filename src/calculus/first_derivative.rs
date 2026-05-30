@@ -1,9 +1,8 @@
-use crate::Function;
 use crate::calculus::util::DerivativeType;
 
 
-fn forward_difference(
-    f: &Function,
+fn forward_difference<F: Fn(f64) -> f64>(
+    f: &F,
     x: f64,
     h: f64,
 ) -> f64 {
@@ -11,8 +10,8 @@ fn forward_difference(
 }
 
 
-fn backward_difference(
-    f: &Function,
+fn backward_difference<F: Fn(f64) -> f64>(
+    f: &F,
     x: f64,
     h: f64,
 ) -> f64 {
@@ -20,8 +19,8 @@ fn backward_difference(
 }
 
 
-fn central_difference(
-    f: &Function,
+fn central_difference<F: Fn(f64) -> f64>(
+    f: &F,
     x: f64,
     h: f64,
 ) -> f64 {
@@ -29,8 +28,8 @@ fn central_difference(
 }
 
 
-pub fn first_derivative(
-    f: &Function,
+pub fn first_derivative<F: Fn(f64) -> f64>(
+    f: &F,
     x: f64,
     h: f64,
     method: DerivativeType,
@@ -51,7 +50,7 @@ mod tests {
 
     #[test]
     fn first_derivative_simple_polynomial_h_one() {
-        let f: Function = Box::new(|x: f64| x*x + 3.0);
+        let f = |x: f64| x*x + 3.0;
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
@@ -72,7 +71,7 @@ mod tests {
 
     #[test]
     fn first_derivative_simple_polynomial() {
-        let f: Function = Box::new(|x: f64| x*x + 3.0);
+        let f = |x: f64| x*x + 3.0;
         let df = |x: f64| 2.0*x;
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
@@ -97,7 +96,7 @@ mod tests {
 
     #[test]
     fn first_derivative_polynomial_h_one() {
-        let f: Function = Box::new(|x: f64| x.powf(3.0) + x.powf(2.0) - 4.0*x - 2.0);
+        let f = |x: f64| x.powf(3.0) + x.powf(2.0) - 4.0*x - 2.0;
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
@@ -118,7 +117,7 @@ mod tests {
 
     #[test]
     fn first_derivative_polynomial() {
-        let f: Function = Box::new(|x: f64| x.powf(3.0) + x.powf(2.0) - 4.0*x - 2.0);
+        let f = |x: f64| x.powf(3.0) + x.powf(2.0) - 4.0*x - 2.0;
         let df = |x: f64| 3.0*x.powf(2.0) + 2.0*x - 4.0;
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
@@ -143,7 +142,7 @@ mod tests {
 
     #[test]
     fn first_derivative_sine_h_one() {
-        let f: Function = Box::new(|x: f64| (2.0*x).sin());
+        let f = |x: f64| (2.0*x).sin();
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
@@ -164,7 +163,7 @@ mod tests {
 
     #[test]
     fn first_derivative_sine() {
-        let f: Function = Box::new(|x: f64| (2.0*x).sin());
+        let f = |x: f64| (2.0*x).sin();
         let df = |x: f64| 2.0*(2.0*x).cos();
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
@@ -189,7 +188,7 @@ mod tests {
 
     #[test]
     fn first_derivative_exponential_h_one() {
-        let f: Function = Box::new(|x: f64| E.powf(-x));
+        let f = |x: f64| E.powf(-x);
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
         for x in xs {
@@ -210,7 +209,7 @@ mod tests {
 
     #[test]
     fn first_derivative_exponential() {
-        let f: Function = Box::new(|x: f64| E.powf(-x));
+        let f = |x: f64| E.powf(-x);
         let df = |x: f64| -1.0*E.powf(-x);
 
         let xs = vec![-3.3, -2.8, -1.2, -0.7, 0.4, 1.5, 2.9, 3.4];
