@@ -1,4 +1,3 @@
-use crate::MultivariateFunction;
 use crate::calculus::util::t_range;
 
 
