@@ -1,15 +1,7 @@
-use crate::MultivariateFunction;
-use crate::calculus::util::SimpleIVPSolverType;
+use crate::calculus::util::{SimpleIVPSolverType, t_range};
 
-fn t_range(t_start: f64, t_end: f64, step: f64) -> Vec<f64> {
-    let size = (( t_end - t_start ) / step) as usize;
-    return (0..size + 1)
-        .map(|i| t_start + i as f64 * step)
-        .collect();
-}
-
-fn eulers_ivp(
-    df: &MultivariateFunction,
+fn eulers_ivp<DF: Fn(Vec<f64>) -> Vec<f64>>(
+    df: &DF,
     y0: f64,
     t0: f64,
     tn: f64,
@@ -25,8 +17,8 @@ fn eulers_ivp(
     return (ts, ys);
 }
 
-fn trapeziod_ivp(
-    df: &MultivariateFunction,
+fn trapeziod_ivp<DF: Fn(Vec<f64>) -> Vec<f64>>(
+    df: &DF,
     y0: f64,
     t0: f64,
     tn: f64,
@@ -43,8 +35,8 @@ fn trapeziod_ivp(
     return (ts, ys);
 }
 
-fn midpoint_ivp(
-    df: &MultivariateFunction,
+fn midpoint_ivp<DF: Fn(Vec<f64>) -> Vec<f64>>(
+    df: &DF,
     y0: f64,
     t0: f64,
     tn: f64,
@@ -61,8 +53,8 @@ fn midpoint_ivp(
     return (ts, ys);
 }
 
-pub fn simple_ivp_solver(
-    df: &MultivariateFunction,
+pub fn simple_ivp_solver<DF: Fn(Vec<f64>) -> Vec<f64>>(
+    df: &DF,
     y0: f64,
     t0: f64,
     tn: f64,
@@ -84,7 +76,7 @@ mod tests {
 
     #[test]
     fn test_simple_ivp_solver() {
-        let df: MultivariateFunction = Box::new(|x| vec![0.5 + 0.5*x[1].powi(2)]);
+        let df = |x: Vec<f64>| {vec![0.5 + 0.5*x[1].powi(2)]};
 
         let (ts, ys) = simple_ivp_solver(&df, 3_f64.sqrt(), 0.0, 1.0, 1e-6, SimpleIVPSolverType::Eulers);
         println!("{:?}, {:?}", ts[0], ts[ts.len() - 1]);

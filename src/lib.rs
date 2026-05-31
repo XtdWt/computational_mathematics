@@ -1,5 +1,4 @@
 use num_complex::Complex;
-use nalgebra::DVector;
 
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
@@ -32,34 +31,32 @@ use crate::calculus::romberg_integration::romberg_integration;
 use crate::calculus::simple_ivp_solver::simple_ivp_solver;
 use crate::calculus::util::{DerivativeType, SimpleIVPSolverType};
 
-type MultivariateFunction = Box<dyn Fn(Vec<f64>) -> Vec<f64>>;
+pub fn wrap_py_multivariatefunction(py_function: Py<PyAny>) -> impl Fn(Vec<f64>) -> Vec<f64> {
+    move |x: Vec<f64>| {
+        Python::attach(|py| {
+            py_function
+                .call1(py, (x,))
+                .and_then(|result| result.extract::<Vec<f64>>(py))
+                .unwrap_or_else(|e| {
+                    e.restore(py);
+                    return Vec::new();
+                })
+        })
+    }
+}
 
-// fn wrap_py_function(py_function: Py<PyAny>) -> Function {
-//     // wrap python function to rust function on heap
-//     return Box::new(move |x| {
-//         let y: f64 = Python::attach(|py| py_function.call1(py, (x,)).unwrap().extract(py).unwrap());
-//         y
-//     });
-// }
-//
-// type Function = Fn(f64) -> f64;
-
-pub fn wrap_py_function(py_function: Py<PyAny>) -> impl Fn(f64) -> f64 + Send + 'static {
+pub fn wrap_py_function(py_function: Py<PyAny>) -> impl Fn(f64) -> f64 {
     move |x: f64| {
         Python::attach(|py| {
             py_function
                 .call1(py, (x,))
                 .and_then(|result| result.extract::<f64>(py))
-                .unwrap_or_else(|e| panic!("Python function call failed: {e}"))
+                .unwrap_or_else(|e| {
+                    e.restore(py);
+                    return f64::NAN;
+                })
         })
     }
-}
-
-fn wrap_py_multivariatefunction(py_function: Py<PyAny>) -> MultivariateFunction {
-    return Box::new(move |x| {
-        let y: Vec<f64> = Python::attach(|py| py_function.call1(py, (x,)).unwrap().extract(py).unwrap());
-        y
-    });
 }
 
 #[macro_export]
@@ -99,7 +96,9 @@ pub fn bisection_method_py(
     eps_tol: f64,
 ) -> PyResult<f64> {
     let f = wrap_py_function(f);
-    if f(a) * f(b) > 0.0 {
+    let f_a = f(a);
+    let f_b = f(b);
+    if f_a * f_b > 0.0 {
         return Err(PyValueError::new_err(
             "`f(a)` and `f(b)` have the same sign.",
         ));
@@ -316,7 +315,7 @@ pub fn simple_ivp_solver_py(
     h: f64,
     method: &str,
 ) -> PyResult<(Vec<f64>, Vec<f64>)> {
-    let df: MultivariateFunction = wrap_py_multivariatefunction(df);
+    let df = wrap_py_multivariatefunction(df);
     let method_as_enum = if method == "euler" {
         SimpleIVPSolverType::Eulers
     } else if method == "trapeziod" {

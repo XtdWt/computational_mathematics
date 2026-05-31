@@ -16,6 +16,17 @@ def test_herons_method():
     assert herons_method(2, 2) == pytest.approx(2**0.5)
 
 
+def test_bisection_method():
+    temp_func = lambda x: x**2 - 2
+    assert bisection_method(temp_func, 0, 2) == pytest.approx(2**0.5)
+
+
+def test_bisection_method_error():
+    temp_func = lambda x, y, z: x**2 - 2 + y + z
+    with pytest.raises(Exception):
+        bisection_method(temp_func, 0, 2)
+
+
 if __name__ == "__main__":
     print(bisection_method(lambda x: x**2 - 4, -1.1, -2.1, 1000))
 
@@ -43,3 +54,10 @@ if __name__ == "__main__":
     print(adaptive_quadrature)
 
     print(romberg_integration(lambda x: x**2 + 7, -1, 4, 2))
+
+    try:
+        temp_func = lambda x, y, z: x**2 - 2 + y + z
+        bisection_method(temp_func, 0, 2)
+    except Exception as e:
+        print(type(e))
+        print(type(e.__cause__))
