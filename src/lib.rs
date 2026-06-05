@@ -29,13 +29,14 @@ use crate::calculus::second_derivative::second_derivative;
 use crate::calculus::adaptive_quadrature::adaptive_quadrature;
 use crate::calculus::romberg_integration::romberg_integration;
 use crate::calculus::simple_ivp_solver::simple_ivp_solver;
+use crate::calculus::rk4_solver::rk4_solver;
 use crate::calculus::util::{DerivativeType, SimpleIVPSolverType};
 
-pub fn wrap_py_multivariatefunction(py_function: Py<PyAny>) -> impl Fn(Vec<f64>) -> Vec<f64> {
-    move |x: Vec<f64>| {
+pub fn wrap_py_multivariatefunction(py_function: Py<PyAny>) -> impl Fn(f64, Vec<f64>) -> Vec<f64> {
+    move |t: f64, x: Vec<f64>| {
         Python::attach(|py| {
             py_function
-                .call1(py, (x,))
+                .call1(py, (t, x,))
                 .and_then(|result| result.extract::<Vec<f64>>(py))
                 .unwrap_or_else(|e| {
                     e.restore(py);
@@ -306,15 +307,15 @@ pub fn romberg_integration_py(
 
 
 #[pyfunction(name = "simple_ivp_solver")]
-#[pyo3(signature = (df, y0, t0, tn, h, method="midpoint"))]
+#[pyo3(signature = (df, y0, t0, tn, h=1e-6, method="midpoint"))]
 pub fn simple_ivp_solver_py(
     df: Py<PyAny>,
-    y0: f64,
+    y0: Vec<f64>,
     t0: f64,
     tn: f64,
     h: f64,
     method: &str,
-) -> PyResult<(Vec<f64>, Vec<f64>)> {
+) -> PyResult<(Vec<f64>, Vec<Vec<f64>>)> {
     let df = wrap_py_multivariatefunction(df);
     let method_as_enum = if method == "euler" {
         SimpleIVPSolverType::Eulers
@@ -324,10 +325,23 @@ pub fn simple_ivp_solver_py(
         SimpleIVPSolverType::Midpoint
     } else {
         return Err(PyValueError::new_err(
-            "method: ".to_owned() + method + " must be one of ['backward', 'forward', 'central']",
+            "method: ".to_owned() + method + " must be one of ['euler', 'trapeziod', 'midpoint']",
         ));
     };
     return Ok(simple_ivp_solver(&df, y0, t0, tn, h, method_as_enum));
+}
+
+#[pyfunction(name = "rk4_solver")]
+#[pyo3(signature = (df, y0, t0, tn, h=1e-6))]
+pub fn rk4_solver_py(
+    df: Py<PyAny>,
+    y0: Vec<f64>,
+    t0: f64,
+    tn: f64,
+    h: f64,
+) -> PyResult<(Vec<f64>, Vec<Vec<f64>>)> {
+    let df = wrap_py_multivariatefunction(df);
+    return Ok(rk4_solver(&df, y0, t0, tn, h));
 }
 
 #[pymodule]
@@ -350,6 +364,7 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(adaptive_quadrature_py, m)?)?;
     m.add_function(wrap_pyfunction!(romberg_integration_py, m)?)?;
     m.add_function(wrap_pyfunction!(simple_ivp_solver_py, m)?)?;
+    m.add_function(wrap_pyfunction!(rk4_solver_py, m)?)?;
 
     m.add_class::<PiecewisePolynomial>()?;
     m.add_class::<Polynomial>()?;
