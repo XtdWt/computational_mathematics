@@ -6,4 +6,4 @@ pub mod adaptive_quadrature;
 pub mod romberg_integration;
 pub mod simple_ivp_solver;
 pub mod rk4_solver;
-pub mod shooting_method;
+pub mod collocation_method;
