@@ -19,7 +19,7 @@ fn backward_difference<F: Fn(f64) -> f64>(
 }
 
 
-fn central_difference<F: Fn(f64) -> f64>(
+pub(crate) fn central_difference<F: Fn(f64) -> f64>(
     f: &F,
     x: f64,
     h: f64,

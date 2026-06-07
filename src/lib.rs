@@ -6,8 +6,9 @@ use pyo3::prelude::*;
 mod root_finding;
 use crate::root_finding::bisection_method::bisection_method;
 use crate::root_finding::herons_method::herons_method;
-use crate::root_finding::newton_raphson_method::newton_raphson_method;
+use crate::root_finding::newton_raphson_method::{newton_raphson_method, quasi_newton_raphson_method};
 use crate::root_finding::secant_method::secant_method;
+use crate::root_finding::golden_section_search::golden_section_search;
 
 mod interpolation;
 use crate::interpolation::barycentric_lagrange_interpolation::barycentric_lagrange_interpolation;
@@ -121,6 +122,18 @@ pub fn newton_raphson_method_py(
     return Ok(newton_raphson_method(&f, &df, x_0, n_max, eps_tol));
 }
 
+#[pyfunction(name = "quasi_newton_raphson_method")]
+#[pyo3(signature = (f, x_0, n_max=100, eps_tol=0.000001))]
+pub fn quasi_newton_raphson_method_py(
+    f: Py<PyAny>,
+    x_0: f64,
+    n_max: usize,
+    eps_tol: f64,
+) -> PyResult<f64> {
+    let f = wrap_py_function(f);
+    return Ok(quasi_newton_raphson_method(&f, x_0, n_max, eps_tol));
+}
+
 #[pyfunction(name = "secant_method")]
 #[pyo3(signature = (f, x_0, x_1, n_max=100, eps_tol=0.000001))]
 pub fn secant_method_py(
@@ -132,6 +145,19 @@ pub fn secant_method_py(
 ) -> PyResult<f64> {
     let f = wrap_py_function(f);
     return Ok(secant_method(&f, x_0, x_1, n_max, eps_tol));
+}
+
+#[pyfunction(name = "golden_section_search")]
+#[pyo3(signature = (f, a, b, n_max=100, eps_tol=0.000001))]
+pub fn golden_section_search_py(
+    f: Py<PyAny>,
+    a: f64,
+    b: f64,
+    n_max: usize,
+    eps_tol: f64,
+) -> PyResult<f64> {
+    let f = wrap_py_function(f);
+    return Ok(golden_section_search(&f, a, b, n_max, eps_tol));
 }
 
 #[pymethods]
@@ -350,6 +376,9 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(secant_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(bisection_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(newton_raphson_method_py, m)?)?;
+    m.add_function(wrap_pyfunction!(quasi_newton_raphson_method_py, m)?)?;
+    m.add_function(wrap_pyfunction!(golden_section_search_py, m)?)?;
+
     m.add_function(wrap_pyfunction!(barycentric_lagrange_interpolation_py, m)?)?;
     m.add_function(wrap_pyfunction!(newtons_divided_difference_interpolation_py, m)?)?;
     m.add_function(wrap_pyfunction!(chebyshev_nodes_py, m)?)?;
@@ -357,6 +386,7 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(fast_fourier_transform_py, m)?)?;
     m.add_function(wrap_pyfunction!(inverse_fast_fourier_transform_py, m)?)?;
     m.add_function(wrap_pyfunction!(fast_fourier_transform_frequencies_py, m)?)?;
+
     m.add_function(wrap_pyfunction!(first_derivative_py, m)?)?;
     m.add_function(wrap_pyfunction!(second_derivative_py, m)?)?;
     m.add_function(wrap_pyfunction!(composite_trapezoid_rule_py, m)?)?;
