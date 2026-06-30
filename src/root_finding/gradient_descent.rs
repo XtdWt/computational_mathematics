@@ -8,7 +8,7 @@ pub fn gradient_descent<DF: Fn(f64) -> f64>(
     let mut x = x_0;
     for _ in 0..n_max {
         let g = df(x);
-        if g.abs() < eps_tol {
+        if (step_size * g).abs() < eps_tol {
             return x;
         }
         x = x - step_size * g;
