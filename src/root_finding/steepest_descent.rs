@@ -13,11 +13,11 @@ pub fn steepest_descent<
     let mut x = x_0;
     for _ in 0..n_max {
         let g = df(x);
-        if g.abs() < eps_tol {
-            return x;
-        }
         let line_search_fn = |alpha| f(x - alpha * g);
         let step_size = golden_section_search(&line_search_fn, 0.0, 2.0, 100, 1e-6);
+        if (step_size * g).abs() < eps_tol {
+            return x;
+        }
         x = x - step_size * g;
     }
     return x;
