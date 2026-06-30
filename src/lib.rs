@@ -10,6 +10,7 @@ use crate::root_finding::newton_raphson_method::{newton_raphson_method, quasi_ne
 use crate::root_finding::secant_method::secant_method;
 use crate::root_finding::golden_section_search::golden_section_search;
 use crate::root_finding::steepest_descent::steepest_descent;
+use crate::root_finding::gradient_descent::gradient_descent;
 
 mod interpolation;
 use crate::interpolation::barycentric_lagrange_interpolation::barycentric_lagrange_interpolation;
@@ -174,6 +175,21 @@ pub fn steepest_descent_py(
     let df = wrap_py_function(df);
     return Ok(steepest_descent(&f, &df, x_0, n_max, eps_tol))
 }
+
+
+#[pyfunction(name = "gradient_descent")]
+#[pyo3(signature = (df, x_0, step_size=0.1, n_max=100, eps_tol=0.000001))]
+pub fn gradient_descent_py(
+    df: Py<PyAny>,
+    x_0: f64,
+    step_size: f64,
+    n_max: usize,
+    eps_tol: f64,
+) -> PyResult<f64> {
+    let df = wrap_py_function(df);
+    return Ok(gradient_descent(&df, x_0, step_size, n_max, eps_tol))
+}
+
 
 #[pymethods]
 impl LagrangePolynomial {
@@ -394,6 +410,7 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(quasi_newton_raphson_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(golden_section_search_py, m)?)?;
     m.add_function(wrap_pyfunction!(steepest_descent_py, m)?)?;
+    m.add_function(wrap_pyfunction!(gradient_descent_py, m)?)?;
 
     m.add_function(wrap_pyfunction!(barycentric_lagrange_interpolation_py, m)?)?;
     m.add_function(wrap_pyfunction!(newtons_divided_difference_interpolation_py, m)?)?;
