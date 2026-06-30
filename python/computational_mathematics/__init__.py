@@ -18,6 +18,7 @@ from .computational_mathematics import (
     romberg_integration,
     secant_method,
     second_derivative,
+    steepest_descent,
 )
 
 __all__ = [
@@ -27,6 +28,7 @@ __all__ = [
     "quasi_newton_raphson_method",
     "secant_method",
     "golden_section_search",
+    "steepest_descent",
     "barycentric_lagrange_interpolation",
     "newtons_divided_difference_interpolation",
     "chebyshev_nodes",
