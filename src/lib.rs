@@ -9,6 +9,7 @@ use crate::root_finding::herons_method::herons_method;
 use crate::root_finding::newton_raphson_method::{newton_raphson_method, quasi_newton_raphson_method};
 use crate::root_finding::secant_method::secant_method;
 use crate::root_finding::golden_section_search::golden_section_search;
+use crate::root_finding::steepest_descent::steepest_descent;
 
 mod interpolation;
 use crate::interpolation::barycentric_lagrange_interpolation::barycentric_lagrange_interpolation;
@@ -158,6 +159,20 @@ pub fn golden_section_search_py(
 ) -> PyResult<f64> {
     let f = wrap_py_function(f);
     return Ok(golden_section_search(&f, a, b, n_max, eps_tol));
+}
+
+#[pyfunction(name = "steepest_descent")]
+#[pyo3(signature = (f, df, x_0, n_max=100, eps_tol=0.000001))]
+pub fn steepest_descent_py(
+    f: Py<PyAny>,
+    df: Py<PyAny>,
+    x_0: f64,
+    n_max: usize,
+    eps_tol: f64,
+) -> PyResult<f64> {
+    let f = wrap_py_function(f);
+    let df = wrap_py_function(df);
+    return Ok(steepest_descent(&f, &df, x_0, n_max, eps_tol))
 }
 
 #[pymethods]
@@ -378,6 +393,7 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(newton_raphson_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(quasi_newton_raphson_method_py, m)?)?;
     m.add_function(wrap_pyfunction!(golden_section_search_py, m)?)?;
+    m.add_function(wrap_pyfunction!(steepest_descent_py, m)?)?;
 
     m.add_function(wrap_pyfunction!(barycentric_lagrange_interpolation_py, m)?)?;
     m.add_function(wrap_pyfunction!(newtons_divided_difference_interpolation_py, m)?)?;

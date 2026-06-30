@@ -9,6 +9,7 @@ from computational_mathematics import (
     herons_method,
     romberg_integration,
     second_derivative,
+    steepest_descent,
 )
 
 
@@ -61,3 +62,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(type(e))
         print(type(e.__cause__))
+
+    print(steepest_descent)
