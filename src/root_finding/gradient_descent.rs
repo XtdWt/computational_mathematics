@@ -20,7 +20,7 @@ pub fn gradient_descent<DF: Fn(f64) -> f64>(
 #[cfg(test)]
 mod tests {
     use crate::assert_almost_eq;
-    use std::f64::consts::E;
+    use std::f64::consts::{E, PI};
     use super::*;
 
     #[test]
@@ -41,5 +41,39 @@ mod tests {
         let result = gradient_descent(&df, 2.0, 0.2, 100, 1e-8);
 
         assert_almost_eq!(result, 0.0);
+    }
+
+    #[test]
+    fn test_gradient_descent_sinusoidal() {
+        let _f = |x: f64| x.sin();
+        let df = |x: f64| x.cos();
+
+        let result = gradient_descent(&df, 1.2, 0.2, 100, 1e-8);
+
+        assert_almost_eq!(result, -PI/2.0);
+    }
+
+    #[test]
+    fn test_gradient_descent_two_peaks() {
+        let _f = |x: f64| x.powi(3) + 3.0*x.powi(2);
+        let df = |x: f64| 3.0*x.powi(2) + 6.0*x;
+
+        let result = gradient_descent(&df, 2.0, 0.2, 100, 1e-8);
+
+        assert_almost_eq!(result, 0.0);
+
+        let result = gradient_descent(&df, -1.9, 0.2, 100, 1e-8);
+
+        assert_almost_eq!(result, 0.0);
+    }
+
+    #[test]
+    fn test_zero_gradient_initial_condition() {
+        let _f = |x: f64| x.powi(3) + 3.0*x.powi(2);
+        let df = |x: f64| 3.0*x.powi(2) + 6.0*x;
+
+        let result = gradient_descent(&df, -2.0, 0.2, 100, 1e-8);
+
+        assert_almost_eq!(result, -2.0);
     }
 }
