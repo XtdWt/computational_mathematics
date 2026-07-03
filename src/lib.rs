@@ -11,6 +11,7 @@ use crate::root_finding::secant_method::secant_method;
 use crate::root_finding::golden_section_search::golden_section_search;
 use crate::root_finding::steepest_descent::steepest_descent;
 use crate::root_finding::gradient_descent::gradient_descent;
+use crate::root_finding::markov_chain_monte_carlo_method::markov_chain_monte_carlo_method;
 
 mod interpolation;
 use crate::interpolation::barycentric_lagrange_interpolation::barycentric_lagrange_interpolation;
@@ -190,6 +191,46 @@ pub fn gradient_descent_py(
     return Ok(gradient_descent(&df, x_0, step_size, n_max, eps_tol))
 }
 
+
+#[pyfunction(name = "markov_chain_monte_carlo_method")]
+#[pyo3(signature = (f, df, x_0, constraint, step_size=0.1, n_max=100, eps_tol=0.000001, sigma=0.05))]
+pub fn markov_chain_monte_carlo_method_py(
+    f: Py<PyAny>,
+    df: Py<PyAny>,
+    x_0: f64,
+    constraint: Py<PyAny>,
+    step_size: f64,
+    n_max: usize,
+    eps_tol: f64,
+    sigma: f64,
+) -> PyResult<f64> {
+    let f = wrap_py_function(f);
+    let df = wrap_py_function(df);
+    // TODO: make constraint fn more generic?
+    let constraint = move |x: f64, y: f64| {
+        Python::attach(|py| {
+            constraint
+                .call1(py, (x, y, ))
+                .and_then(|result| result.extract::<bool>(py))
+                .unwrap_or_else(|e| {
+                    e.restore(py);
+                    return true;
+                })
+        })
+    };
+    return Ok(
+        markov_chain_monte_carlo_method(
+            &f,
+            &df,
+            x_0,
+            &constraint,
+            step_size,
+            n_max,
+            eps_tol,
+            sigma,
+        )
+    );
+}
 
 #[pymethods]
 impl LagrangePolynomial {
@@ -411,6 +452,7 @@ fn computational_mathematics(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(golden_section_search_py, m)?)?;
     m.add_function(wrap_pyfunction!(steepest_descent_py, m)?)?;
     m.add_function(wrap_pyfunction!(gradient_descent_py, m)?)?;
+    m.add_function(wrap_pyfunction!(markov_chain_monte_carlo_method_py, m)?)?;
 
     m.add_function(wrap_pyfunction!(barycentric_lagrange_interpolation_py, m)?)?;
     m.add_function(wrap_pyfunction!(newtons_divided_difference_interpolation_py, m)?)?;

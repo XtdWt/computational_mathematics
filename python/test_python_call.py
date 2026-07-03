@@ -7,6 +7,7 @@ from computational_mathematics import (
     cubic_spline_interpolation,
     fast_fourier_transform,
     herons_method,
+    markov_chain_monte_carlo_method,
     romberg_integration,
     second_derivative,
     steepest_descent,
@@ -63,4 +64,4 @@ if __name__ == "__main__":
         print(type(e))
         print(type(e.__cause__))
 
-    print(steepest_descent)
+    print(steepest_descent, markov_chain_monte_carlo_method)
