@@ -3,15 +3,15 @@ use num_complex::Complex;
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 
-mod root_finding;
-use crate::root_finding::bisection_method::bisection_method;
-use crate::root_finding::herons_method::herons_method;
-use crate::root_finding::newton_raphson_method::{newton_raphson_method, quasi_newton_raphson_method};
-use crate::root_finding::secant_method::secant_method;
-use crate::root_finding::golden_section_search::golden_section_search;
-use crate::root_finding::steepest_descent::steepest_descent;
-use crate::root_finding::gradient_descent::gradient_descent;
-use crate::root_finding::markov_chain_monte_carlo_method::markov_chain_monte_carlo_method;
+mod optimisation;
+use crate::optimisation::bisection_method::bisection_method;
+use crate::optimisation::herons_method::herons_method;
+use crate::optimisation::newton_raphson_method::{newton_raphson_method, quasi_newton_raphson_method};
+use crate::optimisation::secant_method::secant_method;
+use crate::optimisation::golden_section_search::golden_section_search;
+use crate::optimisation::steepest_descent::steepest_descent;
+use crate::optimisation::gradient_descent::gradient_descent;
+use crate::optimisation::markov_chain_monte_carlo_method::markov_chain_monte_carlo_method;
 
 mod interpolation;
 use crate::interpolation::barycentric_lagrange_interpolation::barycentric_lagrange_interpolation;

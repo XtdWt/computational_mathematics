@@ -1,4 +1,4 @@
-use crate::root_finding::golden_section_search::golden_section_search;
+use crate::optimisation::golden_section_search::golden_section_search;
 
 pub fn steepest_descent<
     F: Fn(f64) -> f64,
