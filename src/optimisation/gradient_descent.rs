@@ -11,7 +11,7 @@ pub fn gradient_descent<DF: Fn(f64) -> f64>(
         if (step_size * g).abs() < eps_tol {
             return x;
         }
-        x = x - step_size * g;
+        x -= step_size * g;
     }
     return x;
 }

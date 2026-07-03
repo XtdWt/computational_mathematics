@@ -235,7 +235,7 @@ pub fn markov_chain_monte_carlo_method_py(
 #[pymethods]
 impl LagrangePolynomial {
     fn __call__(&self, x: f64) -> f64 {
-        return self.eval(x).unwrap_or_else(|| f64::NAN);
+        return self.eval(x).unwrap_or(f64::NAN);
     }
 }
 
@@ -247,7 +247,7 @@ pub fn barycentric_lagrange_interpolation_py(xs: Vec<f64>, ys: Vec<f64>) -> Lagr
 #[pymethods]
 impl NewtonsDividedDifferencePolynomial {
     fn __call__(&self, x: f64) -> f64 {
-        return self.eval(x).unwrap_or_else(|| f64::NAN);
+        return self.eval(x).unwrap_or(f64::NAN);
     }
 }
 
@@ -267,7 +267,7 @@ pub fn chebyshev_nodes_py(a: f64, b: f64, n: usize) -> Vec<f64> {
 #[pymethods]
 impl Polynomial {
     fn __call__(&self, py: Python<'_>, x: f64) -> f64 {
-        return py.detach(|| { self.eval(x).unwrap_or_else(|| f64::NAN) });
+        return py.detach(|| { self.eval(x).unwrap_or(f64::NAN) });
     }
 
     #[pyo3(name = "differentiate")]
@@ -284,7 +284,7 @@ impl Polynomial {
 #[pymethods]
 impl PiecewisePolynomial {
     fn __call__(&self, x: f64) -> f64 {
-        return self.eval(x).unwrap_or_else(|| f64::NAN);
+        return self.eval(x).unwrap_or(f64::NAN);
     }
 
     #[pyo3(name = "differentiate")]

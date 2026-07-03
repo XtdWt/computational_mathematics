@@ -52,7 +52,7 @@ pub fn inverse_fast_fourier_transform(xs: Vec<Complex<f64>>) -> Vec<Complex<f64>
 pub fn fast_fourier_transform_frequencies(n: usize, d: f64) -> Vec<f64> {
     let divisor = (n as f64) * d;
     let mut ts = Vec::new();
-    let mid_value = if n % 2 == 0 { n / 2 } else { n / 2 + 1 };
+    let mid_value = if n.is_multiple_of(2) { n / 2 } else { n / 2 + 1 };
 
     for i in 0..mid_value {
         ts.push((i as f64) / divisor);

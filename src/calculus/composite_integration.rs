@@ -23,13 +23,13 @@ pub fn composite_simpsons_rule<F: Fn(f64) -> f64>(
     b: f64,
     n_buckets: usize,
 ) -> f64 {
-    let indices = if n_buckets % 2 == 0 {
+    let indices = if n_buckets.is_multiple_of(2) {
         1..n_buckets/2 + 1
     } else {
         1..(n_buckets-1)/2 + 1
     };
 
-    let step = if n_buckets % 2 == 0 {
+    let step = if n_buckets.is_multiple_of(2) {
         (b-a)/n_buckets as f64
     } else {
         (b-a)/(n_buckets - 1) as f64

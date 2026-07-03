@@ -18,7 +18,7 @@ pub fn steepest_descent<
         if (step_size * g).abs() < eps_tol {
             return x;
         }
-        x = x - step_size * g;
+        x -= step_size * g;
     }
     return x;
 }
