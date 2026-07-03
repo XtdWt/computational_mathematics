@@ -49,7 +49,7 @@ impl Differentiable for Polynomial {
 impl Integrable for Polynomial {
     fn integrate(&self, x0: f64, y0: f64) -> Self {
         let mut int_weights: Vec<f64> = vec![0.0];
-        int_weights.extend(self.weights.par_iter().enumerate().map(|(i, &w)| {w / (i + 1) as f64}).collect::<Vec<f64>>().into_iter());
+        int_weights.extend(self.weights.par_iter().enumerate().map(|(i, &w)| {w / (i + 1) as f64}).collect::<Vec<f64>>());
         let mut definite_integral = Polynomial {
             weights: int_weights,
             x_i: self.x_i,
